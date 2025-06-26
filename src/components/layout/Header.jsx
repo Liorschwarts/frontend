@@ -1,5 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, styled } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import SportsFootballIcon from "@mui/icons-material/SportsFootball";
 import AddIcon from "@mui/icons-material/Add";
 import Button from "../ui/Button";
@@ -40,6 +41,15 @@ const BrandContainer = styled("div")({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing.lg,
+  cursor: "pointer",
+  transition: "all 0.3s ease",
+  padding: theme.spacing.sm,
+  borderRadius: theme.borderRadius.md,
+
+  "&:hover": {
+    background: "rgba(255, 255, 255, 0.1)",
+    transform: "translateY(-2px)",
+  },
 });
 
 const StyledIcon = styled(SportsFootballIcon)({
@@ -72,6 +82,7 @@ const StyledTitle = styled(Typography)({
   fontSize: "1.5rem",
   textShadow: "0 2px 4px rgba(0,0,0,0.3)",
   letterSpacing: "0.5px",
+  userSelect: "none",
 });
 
 const ActionsContainer = styled("div")({
@@ -126,12 +137,22 @@ const FloatingOrb = styled("div")({
   },
 });
 
-const Header = ({ onAddPlayer = () => {}, className = "" }) => {
+const Header = ({ className = "" }) => {
+  const navigate = useNavigate();
+
+  const handleTitleClick = () => {
+    navigate("/players");
+  };
+
+  const handleAddPlayer = () => {
+    navigate("/players/add");
+  };
+
   return (
     <StyledAppBar position="static" className={className}>
       <FloatingOrb />
       <StyledToolbar>
-        <BrandContainer>
+        <BrandContainer onClick={handleTitleClick}>
           <StyledIcon />
           <StyledTitle variant="h6">Football Players Manager</StyledTitle>
         </BrandContainer>
@@ -140,7 +161,7 @@ const Header = ({ onAddPlayer = () => {}, className = "" }) => {
           <StyledAddButton
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={onAddPlayer}
+            onClick={handleAddPlayer}
           >
             Add Player
           </StyledAddButton>

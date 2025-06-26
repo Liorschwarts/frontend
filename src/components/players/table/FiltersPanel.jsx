@@ -62,65 +62,91 @@ const FiltersPanel = ({
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [positions, setPositions] = useState([]);
+  const [countries, setCountries] = useState([]);
   const [filters, setFilters] = useState({
     name: "",
     positionIds: [],
+    countryIds: [],
     ageRange: { min: 18, max: 40 },
     heightRange: { min: 160, max: 200 },
   });
 
-  // Load positions from backend
+  // Load positions and countries from backend
   useEffect(() => {
-    const loadPositions = async () => {
+    const loadFilterData = async () => {
       try {
-        const positionsData = await playersApi.getPositions();
+        const [positionsData, countriesData] = await Promise.all([
+          playersApi.getPositions(),
+          playersApi.getCountries(),
+        ]);
         setPositions(positionsData);
+        setCountries(countriesData);
       } catch (error) {
-        console.error("Failed to load positions:", error);
+        console.error("Failed to load filter data:", error);
       }
     };
-    loadPositions();
+    loadFilterData();
   }, []);
 
   const handleSearch = async () => {
     setLoading(true);
     try {
-      const searchParams = {
-        name: filters.name || undefined,
+      const searchCriteria = {
+        name: filters.name || null,
         positionIds:
-          filters.positionIds.length > 0 ? filters.positionIds : undefined,
-        minAge: filters.ageRange.min !== 18 ? filters.ageRange.min : undefined,
-        maxAge: filters.ageRange.max !== 40 ? filters.ageRange.max : undefined,
+          filters.positionIds.length > 0 ? filters.positionIds : null,
+        countryIds: filters.countryIds.length > 0 ? filters.countryIds : null,
+        minAge: filters.ageRange.min !== 18 ? filters.ageRange.min : null,
+        maxAge: filters.ageRange.max !== 40 ? filters.ageRange.max : null,
         minHeight:
-          filters.heightRange.min !== 160 ? filters.heightRange.min : undefined,
+          filters.heightRange.min !== 160 ? filters.heightRange.min : null,
         maxHeight:
-          filters.heightRange.max !== 200 ? filters.heightRange.max : undefined,
+          filters.heightRange.max !== 200 ? filters.heightRange.max : null,
       };
 
-      const cleanParams = Object.fromEntries(
-        Object.entries(searchParams).filter(([_, v]) => v !== undefined)
+      // Remove null values for cleaner request body
+      const cleanCriteria = Object.fromEntries(
+        Object.entries(searchCriteria).filter(
+          ([_, v]) => v !== null && v !== ""
+        )
       );
 
-      const players = await playersApi.searchPlayers(cleanParams);
+      console.log("Search criteria:", cleanCriteria);
+
+      const players = await playersApi.searchPlayers(cleanCriteria);
+      console.log("Search results:", players.length, "players found");
+      console.log("Search results data:", players);
+
       onPlayersUpdate(players);
-      onFiltersChange(filters);
+      // DON'T call onFiltersChange here - it causes the filtering issue
+      // onFiltersChange(filters);
     } catch (error) {
       console.error("Search failed:", error);
-      onFiltersChange(filters);
+      // Even on error, don't call onFiltersChange
     } finally {
       setLoading(false);
     }
   };
 
-  const clearFilters = () => {
+  const clearFilters = async () => {
     const cleared = {
       name: "",
       positionIds: [],
+      countryIds: [],
       ageRange: { min: 18, max: 40 },
       heightRange: { min: 160, max: 200 },
     };
     setFilters(cleared);
-    onFiltersChange(cleared);
+
+    // Reset to all players when clearing filters
+    try {
+      const allPlayers = await playersApi.getAllPlayers();
+      onPlayersUpdate(allPlayers);
+    } catch (error) {
+      console.error("Failed to load all players:", error);
+    }
+
+    // Don't call onFiltersChange here either - let it just show all players
   };
 
   const updateFilter = (key, value) =>
@@ -193,6 +219,31 @@ const FiltersPanel = ({
               {positions.map((position) => (
                 <MenuItem key={position.id} value={position.id}>
                   {position.code} - {position.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: 200, flex: 1 }}>
+            <InputLabel>Countries</InputLabel>
+            <Select
+              multiple
+              value={filters.countryIds}
+              onChange={(e) => updateFilter("countryIds", e.target.value)}
+              renderValue={(selected) => (
+                <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                  {selected.map((id) => {
+                    const country = countries.find((c) => c.id === id);
+                    return (
+                      <Chip key={id} label={country?.name || id} size="small" />
+                    );
+                  })}
+                </div>
+              )}
+            >
+              {countries.map((country) => (
+                <MenuItem key={country.id} value={country.id}>
+                  {country.name}
                 </MenuItem>
               ))}
             </Select>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -16,8 +16,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { getAllPositions } from "../../../constants/footballPositions";
+import { playersApi } from "../../../services/playersApi";
 import Button from "../../ui/Button";
+import LoadingSpinner from "../../ui/LoadingSpinner";
 import { theme } from "../../../styles/theme";
 
 // Styled Components
@@ -30,6 +31,7 @@ const StyledPaper = styled(Paper)({
   padding: theme.spacing.xl,
   maxWidth: "800px",
   margin: "0 auto",
+  position: "relative",
 
   "&::before": {
     content: '""',
@@ -99,79 +101,41 @@ const PlayerForm = ({
     firstName: player?.firstName || "",
     lastName: player?.lastName || "",
     dateOfBirth: player?.dateOfBirth ? new Date(player.dateOfBirth) : null,
-    countryIds: player?.countries?.map((c) => c.id) || [],
     positionIds: player?.positions?.map((p) => p.id) || [],
+    countryIds: player?.countries?.map((c) => c.id) || [],
     height: player?.height || player?.heightCm || "",
   });
 
   const [errors, setErrors] = useState({});
+  const [countries, setCountries] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [apiError, setApiError] = useState(null);
 
-  // Use existing data from constants and create countries list
-  const allPositions = getAllPositions();
-  const allCountries = [
-    { id: 1, name: "Brazil", code: "BR" },
-    { id: 2, name: "Argentina", code: "AR" },
-    { id: 3, name: "Spain", code: "ES" },
-    { id: 4, name: "England", code: "EN" },
-    { id: 5, name: "France", code: "FR" },
-    { id: 6, name: "Germany", code: "DE" },
-    { id: 7, name: "Italy", code: "IT" },
-    { id: 8, name: "Portugal", code: "PT" },
-    { id: 9, name: "Netherlands", code: "NL" },
-    { id: 10, name: "Belgium", code: "BE" },
-    { id: 11, name: "Croatia", code: "HR" },
-    { id: 12, name: "Morocco", code: "MA" },
-  ];
-
-  // Add IDs to positions based on their index
-  const positionsWithIds = allPositions.map((pos, index) => ({
-    ...pos,
-    id: index + 1,
-  }));
-
-  // Mock data לבינתיים עד שיהיה API
+  // Load countries and positions from API
   useEffect(() => {
-    // Mock countries data
-    const mockCountries = [
-      { id: 1, name: "Brazil", code: "BR" },
-      { id: 2, name: "Argentina", code: "AR" },
-      { id: 3, name: "Spain", code: "ES" },
-      { id: 4, name: "England", code: "EN" },
-      { id: 5, name: "France", code: "FR" },
-      { id: 6, name: "Germany", code: "DE" },
-      { id: 7, name: "Italy", code: "IT" },
-      { id: 8, name: "Portugal", code: "PT" },
-      { id: 9, name: "Netherlands", code: "NL" },
-      { id: 10, name: "Belgium", code: "BE" },
-    ];
+    const loadData = async () => {
+      try {
+        setLoadingData(true);
+        setApiError(null);
 
-    // Mock positions data
-    const mockPositions = [
-      { id: 1, code: "GK", name: "Goalkeeper", category: "Goalkeepers" },
-      { id: 2, code: "CB", name: "Centre-Back", category: "Defenders" },
-      { id: 3, code: "LB", name: "Left-Back", category: "Defenders" },
-      { id: 4, code: "RB", name: "Right-Back", category: "Defenders" },
-      {
-        id: 5,
-        code: "CDM",
-        name: "Defensive Midfielder",
-        category: "Midfielders",
-      },
-      { id: 6, code: "CM", name: "Centre Midfielder", category: "Midfielders" },
-      {
-        id: 7,
-        code: "CAM",
-        name: "Attacking Midfielder",
-        category: "Midfielders",
-      },
-      { id: 8, code: "LW", name: "Left Winger", category: "Forwards" },
-      { id: 9, code: "RW", name: "Right Winger", category: "Forwards" },
-      { id: 10, code: "ST", name: "Striker", category: "Forwards" },
-    ];
+        // Load both countries and positions in parallel
+        const [countriesData, positionsData] = await Promise.all([
+          playersApi.getCountries(),
+          playersApi.getPositions(),
+        ]);
 
-    setCountries(mockCountries);
-    setPositions(mockPositions);
-    setLoadingData(false);
+        setCountries(countriesData);
+        setPositions(positionsData);
+      } catch (error) {
+        console.error("Failed to load form data:", error);
+        setApiError("Failed to load form data from server");
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const validateForm = () => {
@@ -206,14 +170,24 @@ const PlayerForm = ({
       newErrors.height = "Height must be between 150-220 cm";
     }
 
-    console.log("Validation errors:", newErrors); // Debug
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) onSubmit(formData);
+    if (validateForm()) {
+      // Transform the data to match the expected format
+      const submitData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        dateOfBirth: formData.dateOfBirth,
+        heightCm: parseInt(formData.height),
+        positions: formData.positionIds.map((id) => ({ id })),
+        countries: formData.countryIds.map((id) => ({ id })),
+      };
+      onSubmit(submitData);
+    }
   };
 
   const handleFieldChange = (field, value) => {
@@ -223,12 +197,46 @@ const PlayerForm = ({
 
   const isEditing = Boolean(player);
 
+  // Show loading spinner while loading data
   if (loadingData) {
     return (
       <StyledPaper className={className}>
         <FormHeader>
-          <FormTitle>Loading...</FormTitle>
+          <FormTitle>{isEditing ? "Edit Player" : "Add New Player"}</FormTitle>
         </FormHeader>
+        <LoadingSpinner.Inline text="Loading form data..." />
+      </StyledPaper>
+    );
+  }
+
+  // Show error if failed to load data
+  if (apiError) {
+    return (
+      <StyledPaper className={className}>
+        <FormHeader>
+          <FormTitle>{isEditing ? "Edit Player" : "Add New Player"}</FormTitle>
+        </FormHeader>
+        <Typography
+          color="error"
+          variant="body1"
+          sx={{
+            textAlign: "center",
+            p: 3,
+            background: "rgba(244, 67, 54, 0.1)",
+            borderRadius: 2,
+            border: "1px solid rgba(244, 67, 54, 0.3)",
+          }}
+        >
+          ❌ {apiError}
+          <br />
+          <Button
+            variant="outlined"
+            onClick={() => window.location.reload()}
+            sx={{ mt: 2 }}
+          >
+            Retry
+          </Button>
+        </Typography>
       </StyledPaper>
     );
   }
@@ -248,6 +256,7 @@ const PlayerForm = ({
             error={Boolean(errors.firstName)}
             helperText={errors.firstName}
             required
+            fullWidth
           />
           <TextField
             label="Last Name"
@@ -256,6 +265,7 @@ const PlayerForm = ({
             error={Boolean(errors.lastName)}
             helperText={errors.lastName}
             required
+            fullWidth
           />
         </FormRow>
 
@@ -289,51 +299,61 @@ const PlayerForm = ({
             helperText={errors.height}
             inputProps={{ min: 150, max: 220 }}
             required
+            fullWidth
           />
         </FormRow>
 
-        <FormControl error={Boolean(errors.positions)}>
+        <FormControl error={Boolean(errors.positionIds)} fullWidth>
           <InputLabel>Positions *</InputLabel>
           <Select
             multiple
-            value={formData.positions}
-            onChange={(e) => handleFieldChange("positions", e.target.value)}
+            value={formData.positionIds}
+            onChange={(e) => handleFieldChange("positionIds", e.target.value)}
             renderValue={(selected) => (
               <ChipsContainer>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} size="small" />
-                ))}
+                {selected.map((id) => {
+                  const position = positions.find((p) => p.id === id);
+                  return (
+                    <Chip key={id} label={position?.code || id} size="small" />
+                  );
+                })}
               </ChipsContainer>
             )}
           >
-            {allPositions.map((position) => (
-              <MenuItem key={position.code} value={position.code}>
+            {positions.map((position) => (
+              <MenuItem key={position.id} value={position.id}>
                 {position.code} - {position.name}
               </MenuItem>
             ))}
           </Select>
-          {errors.positions && <ErrorText>{errors.positions}</ErrorText>}
+          {errors.positionIds && <ErrorText>{errors.positionIds}</ErrorText>}
         </FormControl>
 
-        <TextField
-          label="Nationalities (comma separated)"
-          value={formData.nationalities.join(", ")}
-          onChange={(e) =>
-            handleFieldChange(
-              "nationalities",
-              e.target.value
-                .split(",")
-                .map((n) => n.trim().toLowerCase())
-                .filter((n) => n)
-            )
-          }
-          error={Boolean(errors.nationalities)}
-          helperText={
-            errors.nationalities || "Enter country codes like: br, ar, us"
-          }
-          placeholder="br, ar, us"
-          required
-        />
+        <FormControl error={Boolean(errors.countryIds)} fullWidth>
+          <InputLabel>Nationalities *</InputLabel>
+          <Select
+            multiple
+            value={formData.countryIds}
+            onChange={(e) => handleFieldChange("countryIds", e.target.value)}
+            renderValue={(selected) => (
+              <ChipsContainer>
+                {selected.map((id) => {
+                  const country = countries.find((c) => c.id === id);
+                  return (
+                    <Chip key={id} label={country?.name || id} size="small" />
+                  );
+                })}
+              </ChipsContainer>
+            )}
+          >
+            {countries.map((country) => (
+              <MenuItem key={country.id} value={country.id}>
+                {country.name}
+              </MenuItem>
+            ))}
+          </Select>
+          {errors.countryIds && <ErrorText>{errors.countryIds}</ErrorText>}
+        </FormControl>
 
         <ActionsContainer>
           <Button
@@ -350,7 +370,11 @@ const PlayerForm = ({
             startIcon={<SaveIcon />}
             disabled={loading}
           >
-            {isEditing ? "Update Player" : "Create Player"}
+            {loading
+              ? "Saving..."
+              : isEditing
+              ? "Update Player"
+              : "Create Player"}
           </Button>
         </ActionsContainer>
       </FormGrid>

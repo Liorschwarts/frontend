@@ -19,12 +19,9 @@ const PageContainer = styled("div")({
 
 const PageHeader = styled("div")({
   display: "flex",
-  justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: theme.spacing.xl,
-  padding: `${theme.spacing.md} 0`,
-  flexWrap: "wrap",
-  gap: theme.spacing.md,
+  marginBottom: theme.spacing.sm, // Much smaller
+  padding: `${theme.spacing.xs} 0`, // Much smaller
 });
 
 const BackButton = styled(IconButton)({
@@ -32,6 +29,8 @@ const BackButton = styled(IconButton)({
   color: theme.colors.primary.main,
   border: `1px solid ${theme.colors.primary.main}40`,
   transition: "all 0.3s ease",
+  margin: 0, // Remove default margin
+  padding: theme.spacing.sm, // Control padding explicitly
 
   "&:hover": {
     background: `${theme.colors.primary.main}30`,
@@ -40,37 +39,12 @@ const BackButton = styled(IconButton)({
   },
 });
 
-const ActionsContainer = styled("div")({
-  display: "flex",
-  gap: theme.spacing.md,
-});
-
-const EditButton = styled(Button)({
-  borderColor: theme.colors.status.warning,
-  color: theme.colors.status.warning,
-
-  "&:hover": {
-    background: `${theme.colors.status.warning}15`,
-    borderColor: theme.colors.status.warning,
-  },
-});
-
-const DeleteButton = styled(Button)({
-  borderColor: theme.colors.status.error,
-  color: theme.colors.status.error,
-
-  "&:hover": {
-    background: `${theme.colors.status.error}15`,
-    borderColor: theme.colors.status.error,
-  },
-});
-
 const ErrorContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["3xl"],
+  marginTop: theme.spacing["2xl"], // Reduced from 3xl
 });
 
 const NotFoundContainer = styled("div")({
@@ -78,7 +52,7 @@ const NotFoundContainer = styled("div")({
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["3xl"],
+  marginTop: theme.spacing["2xl"], // Reduced from 3xl
   textAlign: "center",
 });
 
@@ -189,30 +163,11 @@ const PlayerDetailsPage = () => {
   return (
     <PageContainer>
       <Layout glassEffect={false}>
-        <PageHeader>
-          <BackButton onClick={handleBack} title="Back to Players">
-            <ArrowBackIcon />
-          </BackButton>
-
-          <ActionsContainer>
-            <EditButton
-              variant="outlined"
-              onClick={handleEdit}
-              startIcon={<EditIcon />}
-            >
-              Edit Player
-            </EditButton>
-            <DeleteButton
-              variant="outlined"
-              onClick={handleDeleteClick}
-              startIcon={<DeleteIcon />}
-            >
-              Delete Player
-            </DeleteButton>
-          </ActionsContainer>
-        </PageHeader>
-
-        <PlayerDetails player={player} />
+        <PlayerDetails
+          player={player}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+        />
 
         <DeleteConfirmModal
           open={deleteModal}

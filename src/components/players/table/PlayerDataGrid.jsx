@@ -12,33 +12,31 @@ import { theme } from "../../../styles/theme";
 // Styled Components
 const StyledDataGrid = styled(DataGrid)({
   border: "none",
-  borderRadius: 0,
-  background: "transparent",
+  borderRadius: theme.borderRadius.md,
+  background: theme.effects.glassmorphism.background,
   width: "100%",
   minHeight: "400px",
+  fontSize: "0.9rem",
 
   "& .MuiDataGrid-main": {
-    borderRadius: 0,
+    borderRadius: theme.borderRadius.md,
   },
 
-  "& .MuiDataGrid-topContainer": {
-    background: `linear-gradient(135deg, ${theme.colors.primary.main}, ${theme.colors.primary.dark})`,
-  },
-
-  "& .MuiDataGrid-container--top": {
-    background: `linear-gradient(135deg, ${theme.colors.primary.main}, ${theme.colors.primary.dark})`,
-  },
-
+  // Header styles
   "& .MuiDataGrid-columnHeaders": {
-    background: `linear-gradient(135deg, ${theme.colors.primary.main}, ${theme.colors.primary.dark})`,
-    borderBottom: "none",
+    borderBottom: "1px solid rgba(8, 6, 6, 0.1)",
     minHeight: "56px",
+    borderRadius: `${theme.borderRadius.md} ${theme.borderRadius.md} 0 0`,
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
 
     "& .MuiDataGrid-columnHeader": {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       textAlign: "center",
+      padding: "0 16px",
+      color: `${theme.colors.text.primary} !important`,
     },
 
     "& .MuiDataGrid-columnHeaderTitleContainer": {
@@ -46,34 +44,61 @@ const StyledDataGrid = styled(DataGrid)({
       justifyContent: "center",
       alignItems: "center",
       width: "100%",
+      color: `${theme.colors.text.primary} !important`,
     },
 
     "& .MuiDataGrid-columnHeaderTitle": {
-      color: "white",
-      fontWeight: 700,
-      fontSize: "0.95rem",
+      color: `${theme.colors.text.primary} !important`,
+      fontWeight: "600 !important",
+      fontSize: "0.9rem !important",
       textTransform: "uppercase",
       letterSpacing: "0.5px",
       textAlign: "center",
       width: "100%",
     },
+
+    "& .MuiDataGrid-columnSeparator": {
+      color: "rgba(0, 0, 0, 0.2) !important",
+    },
+
+    "& .MuiDataGrid-iconButtonContainer": {
+      color: `${theme.colors.text.primary} !important`,
+    },
+
+    "& .MuiDataGrid-sortIcon": {
+      color: `${theme.colors.text.primary} !important`,
+    },
+
+    "& .MuiDataGrid-menuIcon": {
+      color: `${theme.colors.text.primary} !important`,
+    },
+
+    "& .MuiDataGrid-menuIconButton": {
+      color: `${theme.colors.text.primary} !important`,
+    },
   },
 
+  // Row styles
   "& .MuiDataGrid-row": {
-    backgroundColor: "#2a3142",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
     minHeight: "64px",
 
-    "&:nth-of-type(even)": {
-      backgroundColor: "#343a4d",
-    },
+    "&:nth-of-type(even)": {},
 
     "&:hover": {
-      backgroundColor: "#4f5365",
+      backgroundColor: "rgba(59, 130, 246, 0.1)",
       transform: "none",
+    },
+
+    "&.Mui-selected": {
+      backgroundColor: "rgba(59, 130, 246, 0.2)",
+      "&:hover": {
+        backgroundColor: "rgba(59, 130, 246, 0.3)",
+      },
     },
   },
 
+  // Cell styles
   "& .MuiDataGrid-cell": {
     padding: theme.spacing.md,
     borderBottom: "none",
@@ -81,9 +106,13 @@ const StyledDataGrid = styled(DataGrid)({
     alignItems: "center",
     justifyContent: "center",
     fontSize: "0.9rem",
-    color: "#ffffff",
+    color: theme.colors.text.primary,
     fontWeight: 500,
     textAlign: "center",
+
+    "&:focus": {
+      outline: "none",
+    },
 
     "& > *": {
       display: "flex",
@@ -93,29 +122,55 @@ const StyledDataGrid = styled(DataGrid)({
     },
   },
 
+  // Footer styles
   "& .MuiDataGrid-footerContainer": {
-    background: "#2a3142",
-    borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+    borderTop: "1px solid rgba(0, 0, 0, 0.1)",
     minHeight: "52px",
+    borderRadius: `0 0 ${theme.borderRadius.md} ${theme.borderRadius.md}`,
 
     "& .MuiTablePagination-root": {
-      color: "#ffffff",
+      color: theme.colors.text.primary,
     },
 
     "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-      color: "#ffffff",
+      color: theme.colors.text.primary,
+      fontWeight: 500,
     },
 
     "& .MuiSelect-icon": {
-      color: "#ffffff",
+      color: theme.colors.text.primary,
+    },
+
+    "& .MuiIconButton-root": {
+      color: theme.colors.text.primary,
+    },
+  },
+
+  // Scrollbar
+  "& .MuiDataGrid-virtualScroller": {
+    "&::-webkit-scrollbar": {
+      width: "8px",
+      height: "8px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "rgba(0, 0, 0, 0.1)",
+      borderRadius: "4px",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      background: theme.colors.primary.main,
+      borderRadius: "4px",
+      "&:hover": {
+        background: theme.colors.primary.dark,
+      },
     },
   },
 });
 
 const PlayerNameCell = styled("div")({
   fontWeight: 600,
-  color: "white",
+  color: theme.colors.text.primary,
   fontSize: "0.95rem",
+  textAlign: "center",
 });
 
 const PlayerAgeCell = styled("span")({
@@ -130,17 +185,19 @@ const PlayerAgeCell = styled("span")({
 
 const PlayerDateCell = styled("span")({
   fontSize: "0.85rem",
-  color: "white",
-  backgroundColor: "rgba(255, 255, 255, 0.2)",
+  color: theme.colors.text.secondary,
+  backgroundColor: "rgba(0, 0, 0, 0.05)",
   padding: "4px 8px",
   borderRadius: theme.borderRadius.sm,
-  border: "1px solid rgba(255, 255, 255, 0.3)",
+  border: "1px solid rgba(0, 0, 0, 0.1)",
+  fontWeight: 500,
 });
 
 const PlayerActionsContainer = styled("div")({
   display: "flex",
-  gap: theme.spacing.xs,
+  gap: theme.spacing.sm,
   alignItems: "center",
+  justifyContent: "center",
 });
 
 const ActionButton = styled(IconButton)(({ actiontype }) => {
@@ -148,31 +205,31 @@ const ActionButton = styled(IconButton)(({ actiontype }) => {
     switch (actiontype) {
       case "view":
         return {
-          background: `${theme.colors.status.info}30`,
+          background: `${theme.colors.status.info}20`,
           color: theme.colors.status.info,
-          border: `1px solid ${theme.colors.status.info}50`,
+          border: `1px solid ${theme.colors.status.info}30`,
           "&:hover": {
-            background: `${theme.colors.status.info}50`,
+            background: `${theme.colors.status.info}30`,
             transform: "scale(1.1)",
           },
         };
       case "edit":
         return {
-          background: `${theme.colors.status.warning}30`,
+          background: `${theme.colors.status.warning}20`,
           color: theme.colors.status.warning,
-          border: `1px solid ${theme.colors.status.warning}50`,
+          border: `1px solid ${theme.colors.status.warning}30`,
           "&:hover": {
-            background: `${theme.colors.status.warning}50`,
+            background: `${theme.colors.status.warning}30`,
             transform: "scale(1.1)",
           },
         };
       case "delete":
         return {
-          background: `${theme.colors.status.error}30`,
+          background: `${theme.colors.status.error}20`,
           color: theme.colors.status.error,
-          border: `1px solid ${theme.colors.status.error}50`,
+          border: `1px solid ${theme.colors.status.error}30`,
           "&:hover": {
-            background: `${theme.colors.status.error}50`,
+            background: `${theme.colors.status.error}30`,
             transform: "scale(1.1)",
           },
         };
@@ -185,7 +242,6 @@ const ActionButton = styled(IconButton)(({ actiontype }) => {
     padding: theme.spacing.xs,
     borderRadius: theme.borderRadius.sm,
     transition: "all 0.2s ease",
-    backdropFilter: "blur(5px)",
     ...getActionStyles(),
   };
 });
@@ -197,9 +253,8 @@ const EmptyStateContainer = styled("div")({
   justifyContent: "center",
   padding: theme.spacing["3xl"],
   background: theme.effects.glassmorphism.background,
-  backdropFilter: theme.effects.glassmorphism.backdropFilter,
   borderRadius: theme.borderRadius.lg,
-  border: theme.effects.glassmorphism.border,
+  border: `1px solid ${theme.colors.divider}`,
   color: theme.colors.text.secondary,
   fontSize: "1.1rem",
 });
@@ -327,7 +382,7 @@ const PlayerDataGrid = ({
   if (!players || players.length === 0) {
     return (
       <EmptyStateContainer className={className}>
-        <span>⚽</span>
+        <span style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚽</span>
         <p>No players found</p>
       </EmptyStateContainer>
     );
@@ -347,6 +402,23 @@ const PlayerDataGrid = ({
         disableColumnMenu
         disableColumnSelector
         disableDensitySelector
+        sx={{
+          "& .MuiDataGrid-row": {
+            cursor: "pointer",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            background: theme.effects.glassmorphism.background,
+            backdropFilter: "blur(10px)",
+            "& .MuiDataGrid-columnHeaderTitle": {
+              color: `${theme.colors.text.primary}`,
+              fontWeight: "600 !important",
+            },
+          },
+          "& .MuiDataGrid-columnHeader": {
+            background: "transparent !important",
+            color: `${theme.colors.text.primary}`,
+          },
+        }}
       />
     </div>
   );

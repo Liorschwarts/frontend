@@ -16,8 +16,8 @@ const PageContainer = styled("div")({
 const PageHeader = styled("div")({
   display: "flex",
   alignItems: "center",
-  marginBottom: theme.spacing.xl,
-  padding: `${theme.spacing.md} 0`,
+  marginBottom: theme.spacing.sm, // Much smaller
+  padding: `${theme.spacing.xs} 0`, // Much smaller
 });
 
 const BackButton = styled(IconButton)({
@@ -38,7 +38,7 @@ const ErrorContainer = styled("div")({
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["3xl"],
+  marginTop: theme.spacing["2xl"], // Reduced from 3xl
 });
 
 const EditPlayerPage = () => {
@@ -136,12 +136,6 @@ const EditPlayerPage = () => {
   return (
     <PageContainer>
       <Layout glassEffect={false}>
-        <PageHeader>
-          <BackButton onClick={handleBack} title="Back to Player Details">
-            <ArrowBackIcon />
-          </BackButton>
-        </PageHeader>
-
         <PlayerForm
           player={player}
           onSubmit={handleSubmit}

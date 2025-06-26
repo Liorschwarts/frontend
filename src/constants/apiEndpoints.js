@@ -15,7 +15,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id) => `${BASE_URL}/players/${id}`,
     DELETE: (id) => `${BASE_URL}/players/${id}`,
     BULK_UPLOAD: `${BASE_URL}/players/bulk`,
-    SEARCH: `${BASE_URL}/players/search`,
+    SEARCH: `${BASE_URL}/players/search`, // POST request
   },
 };
 

@@ -15,8 +15,8 @@ const PageContainer = styled("div")({
 const PageHeader = styled("div")({
   display: "flex",
   alignItems: "center",
-  marginBottom: theme.spacing.xl,
-  padding: `${theme.spacing.md} 0`,
+  marginBottom: theme.spacing.sm, // Much smaller
+  padding: `${theme.spacing.xs} 0`, // Much smaller
 });
 
 const BackButton = styled(IconButton)({
@@ -30,10 +30,6 @@ const BackButton = styled(IconButton)({
     transform: "translateX(-4px)",
     boxShadow: theme.shadows.md,
   },
-});
-
-const FormContainer = styled("div")({
-  marginTop: theme.spacing.lg,
 });
 
 const StyledSnackbar = styled(Snackbar)({
@@ -95,19 +91,11 @@ const AddPlayerPage = () => {
   return (
     <PageContainer>
       <Layout glassEffect={false}>
-        <PageHeader>
-          <BackButton onClick={handleBack} title="Back to Players">
-            <ArrowBackIcon />
-          </BackButton>
-        </PageHeader>
-
-        <FormContainer>
-          <PlayerForm
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            loading={loading}
-          />
-        </FormContainer>
+        <PlayerForm
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          loading={loading}
+        />
 
         <StyledSnackbar
           open={notification.open}

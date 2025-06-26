@@ -19,7 +19,7 @@ const PageContainer = styled("div")({
 const BulkUploadFab = styled(Fab)({
   position: "fixed",
   bottom: theme.spacing.xl,
-  right: theme.spacing.xl,
+  left: theme.spacing.xl, // Changed from right to left
   background: `linear-gradient(135deg, ${theme.colors.secondary.main}, ${theme.colors.secondary.dark})`,
   color: "white",
   zIndex: 1000,
@@ -50,10 +50,6 @@ const PlayersListPage = () => {
     message: "",
     severity: "success",
   });
-
-  const handleAddPlayer = () => {
-    navigate("/players/add");
-  };
 
   const handleBulkUpload = () => {
     setBulkUploadModal(true);
@@ -127,7 +123,7 @@ const PlayersListPage = () => {
 
   return (
     <PageContainer>
-      <Layout onAddPlayer={handleAddPlayer}>
+      <Layout>
         <PlayersTable
           players={players}
           loading={loading}

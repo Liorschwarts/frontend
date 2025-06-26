@@ -34,10 +34,10 @@ const MainContent = styled("main")({
   minHeight: "calc(100vh - 64px)",
 });
 
-const StyledContainer = styled(Container)({
-  padding: `0 ${theme.spacing.lg}`,
+const StyledContainer = styled(Container)(({ noPadding }) => ({
+  padding: noPadding ? 0 : `0 ${theme.spacing.lg}`,
   position: "relative",
-});
+}));
 
 const ContentWrapper = styled(Box)({
   background: theme.effects.glassmorphism.background,
@@ -98,18 +98,27 @@ const FloatingShapes = styled("div")({
 
 const Layout = ({
   children,
-  onAddPlayer = () => {},
   maxWidth = "xl",
   glassEffect = true,
+  noPadding = false,
   className = "",
+  style = {},
 }) => {
   return (
     <LayoutWrapper className={className}>
       <FloatingShapes />
-      <Header onAddPlayer={onAddPlayer} />{" "}
+      <Header />
       <MainContent>
-        <StyledContainer maxWidth={maxWidth}>
-          {glassEffect ? <ContentWrapper>{children}</ContentWrapper> : children}
+        <StyledContainer
+          maxWidth={maxWidth}
+          noPadding={noPadding || !glassEffect}
+          style={style}
+        >
+          {glassEffect ? (
+            <ContentWrapper>{children}</ContentWrapper>
+          ) : (
+            <div style={style}>{children}</div>
+          )}
         </StyledContainer>
       </MainContent>
     </LayoutWrapper>

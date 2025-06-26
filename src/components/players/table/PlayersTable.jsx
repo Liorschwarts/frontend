@@ -49,6 +49,22 @@ const PlayersTable = ({
   const [filteredPlayers, setFilteredPlayers] = useState(players);
 
   const handleFiltersChange = (filters) => {
+    // If no filters are active, show all players
+    const hasActiveFilters = !!(
+      filters.name ||
+      (filters.positionIds && filters.positionIds.length > 0) ||
+      (filters.countryIds && filters.countryIds.length > 0) ||
+      (filters.ageRange &&
+        (filters.ageRange.min !== 18 || filters.ageRange.max !== 40)) ||
+      (filters.heightRange &&
+        (filters.heightRange.min !== 160 || filters.heightRange.max !== 200))
+    );
+
+    if (!hasActiveFilters) {
+      setFilteredPlayers(players);
+      return;
+    }
+
     let filtered = [...players];
 
     if (filters.name) {
@@ -59,9 +75,17 @@ const PlayersTable = ({
       );
     }
 
-    if (filters.positions?.length > 0) {
+    if (filters.positionIds?.length > 0) {
       filtered = filtered.filter((player) =>
-        player.positions?.some((pos) => filters.positions.includes(pos.code))
+        player.positions?.some((pos) => filters.positionIds.includes(pos.id))
+      );
+    }
+
+    if (filters.countryIds?.length > 0) {
+      filtered = filtered.filter((player) =>
+        player.countries?.some((country) =>
+          filters.countryIds.includes(country.id)
+        )
       );
     }
 
@@ -85,6 +109,16 @@ const PlayersTable = ({
     setFilteredPlayers(filtered);
   };
 
+  const handlePlayersUpdate = (newPlayers) => {
+    console.log("Updating players list with:", newPlayers.length, "players");
+    console.log("Filtered Players:", newPlayers);
+    setFilteredPlayers(newPlayers);
+  };
+
+  useEffect(() => {
+    setFilteredPlayers(players);
+  }, [players]);
+
   const calculateAge = (birthDate) => {
     if (!birthDate) return 0;
     const today = new Date();
@@ -102,7 +136,10 @@ const PlayersTable = ({
         <TableTitle>Players ({filteredPlayers.length})</TableTitle>
       </TableHeader>
 
-      <FiltersPanel onFiltersChange={handleFiltersChange} />
+      <FiltersPanel
+        onFiltersChange={handleFiltersChange}
+        onPlayersUpdate={handlePlayersUpdate}
+      />
 
       <GridContainer>
         <PlayerDataGrid

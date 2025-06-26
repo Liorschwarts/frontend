@@ -100,13 +100,13 @@ export const playersApi = {
     }
   },
 
-  // Search players
-  searchPlayers: async (searchParams) => {
+  // Search players using POST request
+  searchPlayers: async (searchCriteria) => {
     try {
-      const queryString = new URLSearchParams(searchParams).toString();
-      const url = `${API_ENDPOINTS.PLAYERS.SEARCH}?${queryString}`;
-
-      const response = await apiClient.get(url);
+      const response = await apiClient.post(
+        API_ENDPOINTS.PLAYERS.SEARCH,
+        searchCriteria
+      );
       return response || [];
     } catch (error) {
       console.error("Error searching players:", error);
@@ -114,6 +114,7 @@ export const playersApi = {
     }
   },
 
+  // Get all countries
   getCountries: async () => {
     try {
       const response = await apiClient.get(

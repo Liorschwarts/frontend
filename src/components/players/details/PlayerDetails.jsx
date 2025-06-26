@@ -12,9 +12,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import PublicIcon from "@mui/icons-material/Public";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import CountryFlags from "../display/CountryFlags";
 import HeightDisplay from "../display/HeightDisplay";
 import PositionBadges from "../display/PositionBadges";
+import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
 // Styled Components
@@ -44,9 +47,9 @@ const StyledPaper = styled(Paper)({
 const HeaderSection = styled("div")({
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing.xl,
-  marginBottom: theme.spacing.xl,
-  paddingTop: theme.spacing.sm,
+  gap: theme.spacing.lg,
+  marginBottom: theme.spacing.lg,
+  paddingTop: theme.spacing.xs,
 });
 
 const StyledAvatar = styled(Avatar)({
@@ -62,7 +65,7 @@ const PlayerName = styled(Typography)({
   color: theme.colors.text.primary,
   fontWeight: 700,
   fontSize: "1.8rem",
-  marginBottom: theme.spacing.sm,
+  marginBottom: theme.spacing.xs,
 });
 
 const NationalitySection = styled("div")({
@@ -74,7 +77,7 @@ const NationalitySection = styled("div")({
 const SectionContainer = styled("div")({
   background: "rgba(255, 255, 255, 0.1)",
   borderRadius: theme.borderRadius.md,
-  padding: theme.spacing.lg,
+  padding: theme.spacing.md,
   backdropFilter: "blur(10px)",
   border: "1px solid rgba(255, 255, 255, 0.2)",
   height: "100%",
@@ -84,7 +87,7 @@ const SectionHeader = styled("div")({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing.md,
-  marginBottom: theme.spacing.lg,
+  marginBottom: theme.spacing.md,
 });
 
 const SectionIcon = styled("div")({
@@ -108,10 +111,10 @@ const InfoItem = styled("div")({
   display: "flex",
   flexDirection: "column",
   gap: theme.spacing.xs,
-  padding: theme.spacing.md,
+  padding: theme.spacing.sm,
   background: "rgba(255, 255, 255, 0.2)",
   borderRadius: theme.borderRadius.sm,
-  marginBottom: theme.spacing.md,
+  marginBottom: theme.spacing.sm,
 });
 
 const InfoLabel = styled(Typography)({
@@ -128,7 +131,41 @@ const InfoValue = styled(Typography)({
   fontSize: "1rem",
 });
 
-const PlayerDetails = ({ player, className = "" }) => {
+const ActionsContainer = styled("div")({
+  display: "flex",
+  justifyContent: "center",
+  gap: theme.spacing.lg,
+  marginTop: theme.spacing.lg,
+  paddingTop: theme.spacing.md,
+  borderTop: `1px solid ${theme.colors.divider}`,
+});
+
+const EditButton = styled(Button)({
+  borderColor: theme.colors.status.warning,
+  color: theme.colors.status.warning,
+
+  "&:hover": {
+    background: `${theme.colors.status.warning}15`,
+    borderColor: theme.colors.status.warning,
+  },
+});
+
+const DeleteButton = styled(Button)({
+  borderColor: theme.colors.status.error,
+  color: theme.colors.status.error,
+
+  "&:hover": {
+    background: `${theme.colors.status.error}15`,
+    borderColor: theme.colors.status.error,
+  },
+});
+
+const PlayerDetails = ({
+  player,
+  onEdit = () => {},
+  onDelete = () => {},
+  className = "",
+}) => {
   const calculateAge = (birthDate) => {
     if (!birthDate) return "";
     return new Date().getFullYear() - new Date(birthDate).getFullYear();
@@ -169,7 +206,7 @@ const PlayerDetails = ({ player, className = "" }) => {
 
       <Divider
         sx={{
-          margin: `${theme.spacing.lg} 0`,
+          margin: `${theme.spacing.md} 0`,
           background: theme.colors.divider,
         }}
       />
@@ -248,6 +285,25 @@ const PlayerDetails = ({ player, className = "" }) => {
           </SectionContainer>
         </Grid>
       </Grid>
+
+      <ActionsContainer>
+        <EditButton
+          variant="outlined"
+          onClick={onEdit}
+          startIcon={<EditIcon />}
+          size="large"
+        >
+          Edit Player
+        </EditButton>
+        <DeleteButton
+          variant="outlined"
+          onClick={onDelete}
+          startIcon={<DeleteIcon />}
+          size="large"
+        >
+          Delete Player
+        </DeleteButton>
+      </ActionsContainer>
     </StyledPaper>
   );
 };
