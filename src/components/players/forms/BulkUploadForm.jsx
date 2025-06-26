@@ -138,17 +138,6 @@ const BulkUploadForm = ({
         </UploadSubtitle>
       </UploadHeader>
 
-      <InfoAlert severity="info">
-        <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-          CSV Format Required:
-        </Typography>
-        <Typography variant="body2" component="div">
-          firstName,lastName,dateOfBirth,nationalities,positions,height
-          <br />
-          <strong>Example:</strong> John,Doe,1995-05-15,"br,ar","ST,CF",185
-        </Typography>
-      </InfoAlert>
-
       <FileUpload onFileSelect={handleFileSelect} disabled={isUploading} />
 
       {isUploading && (
