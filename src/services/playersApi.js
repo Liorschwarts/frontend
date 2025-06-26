@@ -113,6 +113,31 @@ export const playersApi = {
       throw error;
     }
   },
+
+  getCountries: async () => {
+    try {
+      const response = await apiClient.get(
+        `${API_ENDPOINTS.BASE_URL}/countries`
+      );
+      return response || [];
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      throw error;
+    }
+  },
+
+  // Get all positions
+  getPositions: async () => {
+    try {
+      const response = await apiClient.get(
+        `${API_ENDPOINTS.BASE_URL}/positions`
+      );
+      return response || [];
+    } catch (error) {
+      console.error("Error fetching positions:", error);
+      throw error;
+    }
+  },
 };
 
 export default playersApi;

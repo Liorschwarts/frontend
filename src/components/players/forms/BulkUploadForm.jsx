@@ -1,9 +1,91 @@
 import React, { useState } from "react";
-import { Paper, Typography, Alert, LinearProgress } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Alert,
+  LinearProgress,
+  styled,
+  Box,
+} from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FileUpload from "../../ui/FileUpload";
 import Button from "../../ui/Button";
+import { theme } from "../../../styles/theme";
+
+// Styled Components
+const UploadContainer = styled(Paper)({
+  background: theme.effects.glassmorphism.background,
+  backdropFilter: theme.effects.glassmorphism.backdropFilter,
+  border: theme.effects.glassmorphism.border,
+  borderRadius: theme.borderRadius.xl,
+  boxShadow: theme.shadows.lg,
+  padding: theme.spacing["3xl"],
+  maxWidth: "600px",
+  margin: "0 auto",
+  textAlign: "center",
+});
+
+const UploadHeader = styled(Box)({
+  marginBottom: theme.spacing.xl,
+});
+
+const UploadTitle = styled(Typography)({
+  color: theme.colors.text.primary,
+  fontWeight: 700,
+  fontSize: "1.75rem",
+  marginBottom: theme.spacing.sm,
+});
+
+const UploadSubtitle = styled(Typography)({
+  color: theme.colors.text.secondary,
+  fontSize: "1rem",
+});
+
+const InfoAlert = styled(Alert)({
+  marginBottom: theme.spacing.xl,
+  borderRadius: theme.borderRadius.md,
+  textAlign: "left",
+
+  "& .MuiAlert-message": {
+    fontSize: "0.9rem",
+  },
+});
+
+const ProgressContainer = styled(Box)({
+  marginTop: theme.spacing.lg,
+  marginBottom: theme.spacing.lg,
+});
+
+const ProgressText = styled(Typography)({
+  color: theme.colors.text.secondary,
+  fontSize: "0.9rem",
+  marginBottom: theme.spacing.sm,
+});
+
+const StyledProgress = styled(LinearProgress)({
+  height: "8px",
+  borderRadius: theme.borderRadius.sm,
+  background: "rgba(255, 255, 255, 0.2)",
+
+  "& .MuiLinearProgress-bar": {
+    background: `linear-gradient(90deg, ${theme.colors.primary.main}, ${theme.colors.secondary.main})`,
+  },
+});
+
+const ResultAlert = styled(Alert)({
+  marginTop: theme.spacing.lg,
+  borderRadius: theme.borderRadius.md,
+  textAlign: "left",
+});
+
+const ActionsContainer = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  gap: theme.spacing.lg,
+  marginTop: theme.spacing.xl,
+});
 
 const BulkUploadForm = ({
   onUpload = () => {},
@@ -18,6 +100,7 @@ const BulkUploadForm = ({
   const handleFileSelect = (file) => {
     setSelectedFile(file);
     setResult(null);
+    setUploadProgress(0);
   };
 
   const handleUpload = async () => {
@@ -28,94 +111,83 @@ const BulkUploadForm = ({
       const result = await onUpload(selectedFile, (progress) => {
         setUploadProgress(progress);
       });
-      setResult(result);
+
+      setResult({
+        success: true,
+        message: `Successfully uploaded ${result.count || 0} players! 🎉`,
+        count: result.count,
+      });
+
       setSelectedFile(null);
     } catch (error) {
       setResult({
         success: false,
-        message: error.message || "Upload failed",
+        message: error.message || "Upload failed ❌",
       });
     }
   };
 
+  const isUploading = loading || uploadProgress > 0;
+
   return (
-    <Paper className={`bulk-upload-form ${className}`}>
-      <div className="bulk-upload-form__header">
-        <Typography variant="h5" className="bulk-upload-form__title">
-          Bulk Upload Players
+    <UploadContainer className={className}>
+      <UploadHeader>
+        <UploadTitle>Bulk Upload Players</UploadTitle>
+        <UploadSubtitle>
+          Upload multiple players at once using a CSV file
+        </UploadSubtitle>
+      </UploadHeader>
+
+      <InfoAlert severity="info">
+        <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+          CSV Format Required:
         </Typography>
-        <Typography variant="body2" className="bulk-upload-form__subtitle">
-          Upload a CSV file with multiple players
+        <Typography variant="body2" component="div">
+          firstName,lastName,dateOfBirth,nationalities,positions,height
+          <br />
+          <strong>Example:</strong> John,Doe,1995-05-15,"br,ar","ST,CF",185
         </Typography>
-      </div>
+      </InfoAlert>
 
-      <div className="bulk-upload-form__content">
-        <Alert severity="info" className="bulk-upload-form__info">
-          <Typography variant="body2">
-            <strong>CSV Format Required:</strong>
-            <br />
-            firstName,lastName,dateOfBirth,nationalities,positions,height
-            <br />
-            Example: John,Doe,1995-05-15,"br,ar","ST,CF",185
-          </Typography>
-        </Alert>
+      <FileUpload onFileSelect={handleFileSelect} disabled={isUploading} />
 
-        <FileUpload
-          onFileSelect={handleFileSelect}
-          disabled={loading}
-          className="bulk-upload-form__upload"
-        />
+      {isUploading && (
+        <ProgressContainer>
+          <ProgressText>Uploading players... {uploadProgress}%</ProgressText>
+          <StyledProgress variant="determinate" value={uploadProgress} />
+        </ProgressContainer>
+      )}
 
-        {loading && (
-          <div className="bulk-upload-form__progress">
-            <Typography
-              variant="body2"
-              className="bulk-upload-form__progress-text"
-            >
-              Uploading... {uploadProgress}%
+      {result && (
+        <ResultAlert severity={result.success ? "success" : "error"}>
+          <Typography variant="body2">{result.message}</Typography>
+          {result.success && result.count > 0 && (
+            <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
+              {result.count} players added to the database
             </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={uploadProgress}
-              className="bulk-upload-form__progress-bar"
-            />
-          </div>
-        )}
+          )}
+        </ResultAlert>
+      )}
 
-        {result && (
-          <Alert
-            severity={result.success ? "success" : "error"}
-            className="bulk-upload-form__result"
-          >
-            {result.message}
-            {result.success && result.count && (
-              <Typography variant="body2">
-                Successfully uploaded {result.count} players
-              </Typography>
-            )}
-          </Alert>
-        )}
-      </div>
-
-      <div className="bulk-upload-form__actions">
+      <ActionsContainer>
         <Button
           variant="outlined"
           onClick={onCancel}
           startIcon={<CancelIcon />}
-          disabled={loading}
+          disabled={isUploading}
         >
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={handleUpload}
-          startIcon={<UploadIcon />}
-          disabled={!selectedFile || loading}
+          startIcon={isUploading ? <CheckCircleIcon /> : <UploadIcon />}
+          disabled={!selectedFile || isUploading}
         >
-          {loading ? "Uploading..." : "Upload Players"}
+          {isUploading ? `Uploading... ${uploadProgress}%` : "Upload Players"}
         </Button>
-      </div>
-    </Paper>
+      </ActionsContainer>
+    </UploadContainer>
   );
 };
 

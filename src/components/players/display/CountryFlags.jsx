@@ -1,5 +1,40 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, styled } from "@mui/material";
+import { theme } from "../../../styles/theme";
+
+// Styled Components
+const FlagsContainer = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.xs,
+  flexWrap: "wrap",
+});
+
+const FlagImage = styled("img")(({ size }) => {
+  const getSizeStyles = () => {
+    switch (size) {
+      case "small":
+        return { width: "20px", height: "15px" };
+      case "large":
+        return { width: "32px", height: "24px" };
+      default: // medium
+        return { width: "24px", height: "18px" };
+    }
+  };
+
+  return {
+    ...getSizeStyles(),
+    borderRadius: theme.borderRadius.xs || "2px",
+    boxShadow: theme.shadows.sm,
+    transition: "all 0.2s ease",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+
+    "&:hover": {
+      transform: "scale(1.1)",
+      boxShadow: theme.shadows.md,
+    },
+  };
+});
 
 const CountryFlags = ({
   nationalities = [],
@@ -15,17 +50,18 @@ const CountryFlags = ({
   };
 
   return (
-    <Box className={`country-flags country-flags--${size} ${className}`}>
+    <FlagsContainer className={className}>
       {nationalities.map((nationality, index) => (
-        <img
+        <FlagImage
           key={index}
           src={getFlagUrl(nationality)}
           alt={nationality}
-          className="country-flags__flag"
+          size={size}
           title={nationality.toUpperCase()}
+          loading="lazy"
         />
       ))}
-    </Box>
+    </FlagsContainer>
   );
 };
 

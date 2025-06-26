@@ -1,57 +1,106 @@
 import React from "react";
-import { Box, CircularProgress, Typography, Backdrop } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Backdrop,
+  styled,
+} from "@mui/material";
+import { theme } from "../../styles/theme";
+
+// Styled Components
+const SpinnerContainer = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: theme.spacing.lg,
+});
+
+const SpinnerText = styled(Typography)({
+  marginTop: theme.spacing.md,
+  textAlign: "center",
+  color: theme.colors.text.secondary,
+  fontSize: "0.9rem",
+});
+
+const OverlayContainer = styled(Box)({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(255, 255, 255, 0.8)",
+  backdropFilter: "blur(4px)",
+  zIndex: 1000,
+  borderRadius: "inherit",
+});
+
+const PageContainer = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "400px",
+  background: theme.effects.glassmorphism.background,
+  backdropFilter: theme.effects.glassmorphism.backdropFilter,
+  borderRadius: theme.borderRadius.lg,
+  border: theme.effects.glassmorphism.border,
+});
+
+const StyledBackdrop = styled(Backdrop)({
+  color: "#fff",
+  zIndex: 1500,
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
+  backdropFilter: "blur(8px)",
+});
 
 const LoadingSpinner = ({
   size = 40,
   color = "primary",
   text = "",
   overlay = false,
-  className = "",
   fullScreen = false,
+  className = "",
   ...props
 }) => {
   const SpinnerContent = () => (
-    <Box className={`loading-spinner ${className}`} {...props}>
+    <SpinnerContainer className={className} {...props}>
       <CircularProgress size={size} color={color} />
-      {text && (
-        <Typography variant="body2" className="loading-spinner-text">
-          {text}
-        </Typography>
-      )}
-    </Box>
+      {text && <SpinnerText>{text}</SpinnerText>}
+    </SpinnerContainer>
   );
 
-  // Full screen loading with backdrop
   if (fullScreen) {
     return (
-      <Backdrop className="loading-backdrop" open={true}>
+      <StyledBackdrop open={true}>
         <SpinnerContent />
-      </Backdrop>
+      </StyledBackdrop>
     );
   }
 
-  // Overlay within container
   if (overlay) {
     return (
-      <Box className="loading-overlay">
+      <OverlayContainer>
         <SpinnerContent />
-      </Box>
+      </OverlayContainer>
     );
   }
 
-  // Regular inline spinner
   return <SpinnerContent />;
 };
 
-// Pre-built loading states
+// Pre-built variants
 LoadingSpinner.Inline = ({ text = "Loading...", ...props }) => (
   <LoadingSpinner size={20} text={text} {...props} />
 );
 
 LoadingSpinner.Page = ({ text = "Loading page...", ...props }) => (
-  <Box className="loading-page" {...props}>
+  <PageContainer {...props}>
     <LoadingSpinner size={60} text={text} />
-  </Box>
+  </PageContainer>
 );
 
 LoadingSpinner.Button = ({ ...props }) => (

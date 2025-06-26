@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { IconButton, Typography, Alert } from "@mui/material";
+import { IconButton, Typography, Alert, styled } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -10,6 +10,77 @@ import DeleteConfirmModal from "../components/players/forms/DeleteConfirmModal";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import Button from "../components/ui/Button";
 import usePlayersData from "../hooks/usePlayersData";
+import { theme } from "../styles/theme";
+
+// Styled Components
+const PageContainer = styled("div")({
+  minHeight: "100vh",
+});
+
+const PageHeader = styled("div")({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: theme.spacing.xl,
+  padding: `${theme.spacing.md} 0`,
+  flexWrap: "wrap",
+  gap: theme.spacing.md,
+});
+
+const BackButton = styled(IconButton)({
+  background: `${theme.colors.primary.main}20`,
+  color: theme.colors.primary.main,
+  border: `1px solid ${theme.colors.primary.main}40`,
+  transition: "all 0.3s ease",
+
+  "&:hover": {
+    background: `${theme.colors.primary.main}30`,
+    transform: "translateX(-4px)",
+    boxShadow: theme.shadows.md,
+  },
+});
+
+const ActionsContainer = styled("div")({
+  display: "flex",
+  gap: theme.spacing.md,
+});
+
+const EditButton = styled(Button)({
+  borderColor: theme.colors.status.warning,
+  color: theme.colors.status.warning,
+
+  "&:hover": {
+    background: `${theme.colors.status.warning}15`,
+    borderColor: theme.colors.status.warning,
+  },
+});
+
+const DeleteButton = styled(Button)({
+  borderColor: theme.colors.status.error,
+  color: theme.colors.status.error,
+
+  "&:hover": {
+    background: `${theme.colors.status.error}15`,
+    borderColor: theme.colors.status.error,
+  },
+});
+
+const ErrorContainer = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: theme.spacing.lg,
+  marginTop: theme.spacing["3xl"],
+});
+
+const NotFoundContainer = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: theme.spacing.lg,
+  marginTop: theme.spacing["3xl"],
+  textAlign: "center",
+});
 
 const PlayerDetailsPage = () => {
   const { id } = useParams();
@@ -71,7 +142,7 @@ const PlayerDetailsPage = () => {
 
   if (loading) {
     return (
-      <Layout showHeader={false}>
+      <Layout glassEffect={false}>
         <LoadingSpinner.Page text="Loading player details..." />
       </Layout>
     );
@@ -79,32 +150,28 @@ const PlayerDetailsPage = () => {
 
   if (error) {
     return (
-      <Layout showHeader={false}>
-        <div className="player-details-page__error">
-          <Alert severity="error" className="player-details-page__error-alert">
+      <Layout glassEffect={false}>
+        <ErrorContainer>
+          <Alert severity="error" sx={{ maxWidth: "500px" }}>
             {error}
           </Alert>
           <Button
             variant="contained"
             onClick={handleBack}
             startIcon={<ArrowBackIcon />}
-            className="player-details-page__back-button"
           >
             Back to Players
           </Button>
-        </div>
+        </ErrorContainer>
       </Layout>
     );
   }
 
   if (!player) {
     return (
-      <Layout showHeader={false}>
-        <div className="player-details-page__not-found">
-          <Typography
-            variant="h5"
-            className="player-details-page__not-found-title"
-          >
+      <Layout glassEffect={false}>
+        <NotFoundContainer>
+          <Typography variant="h5" color="text.secondary">
             Player not found
           </Typography>
           <Button
@@ -114,43 +181,36 @@ const PlayerDetailsPage = () => {
           >
             Back to Players
           </Button>
-        </div>
+        </NotFoundContainer>
       </Layout>
     );
   }
 
   return (
-    <div className="player-details-page">
-      <Layout showHeader={false}>
-        <div className="player-details-page__header">
-          <IconButton
-            onClick={handleBack}
-            className="player-details-page__back-icon"
-            title="Back to Players"
-          >
+    <PageContainer>
+      <Layout glassEffect={false}>
+        <PageHeader>
+          <BackButton onClick={handleBack} title="Back to Players">
             <ArrowBackIcon />
-          </IconButton>
+          </BackButton>
 
-          <div className="player-details-page__actions">
-            <Button
+          <ActionsContainer>
+            <EditButton
               variant="outlined"
               onClick={handleEdit}
               startIcon={<EditIcon />}
-              className="player-details-page__edit-button"
             >
               Edit Player
-            </Button>
-            <Button
+            </EditButton>
+            <DeleteButton
               variant="outlined"
-              color="error"
               onClick={handleDeleteClick}
               startIcon={<DeleteIcon />}
-              className="player-details-page__delete-button"
             >
               Delete Player
-            </Button>
-          </div>
-        </div>
+            </DeleteButton>
+          </ActionsContainer>
+        </PageHeader>
 
         <PlayerDetails player={player} />
 
@@ -162,7 +222,7 @@ const PlayerDetailsPage = () => {
           loading={deleting}
         />
       </Layout>
-    </div>
+    </PageContainer>
   );
 };
 

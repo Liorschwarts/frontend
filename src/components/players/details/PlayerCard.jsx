@@ -5,6 +5,7 @@ import {
   Typography,
   Avatar,
   IconButton,
+  styled,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -13,6 +14,172 @@ import PersonIcon from "@mui/icons-material/Person";
 import CountryFlags from "../display/CountryFlags";
 import HeightDisplay from "../display/HeightDisplay";
 import PositionBadges from "../display/PositionBadges";
+import { theme } from "../../../styles/theme";
+
+// Styled Components
+const StyledCard = styled(Card)({
+  background: theme.effects.glassmorphism.background,
+  backdropFilter: theme.effects.glassmorphism.backdropFilter,
+  border: theme.effects.glassmorphism.border,
+  borderRadius: theme.borderRadius.lg,
+  boxShadow: theme.shadows.md,
+  height: "100%",
+  position: "relative",
+  overflow: "hidden",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "3px",
+    background: `linear-gradient(90deg, ${theme.colors.primary.main}, ${theme.colors.secondary.main})`,
+    borderRadius: `${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0`,
+  },
+
+  "&:hover": {
+    transform: "translateY(-4px)",
+    boxShadow: theme.shadows.lg,
+    background: "rgba(255, 255, 255, 0.4)",
+  },
+});
+
+const StyledCardContent = styled(CardContent)({
+  padding: theme.spacing.lg,
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+});
+
+const CardHeader = styled("div")({
+  display: "flex",
+  alignItems: "flex-start",
+  gap: theme.spacing.md,
+  marginBottom: theme.spacing.lg,
+});
+
+const StyledAvatar = styled(Avatar)({
+  background: `linear-gradient(135deg, ${theme.colors.primary.main}, ${theme.colors.accent.purple})`,
+  color: "white",
+  width: 48,
+  height: 48,
+  boxShadow: theme.shadows.sm,
+  border: "2px solid rgba(255, 255, 255, 0.2)",
+  flexShrink: 0,
+});
+
+const BasicInfoContainer = styled("div")({
+  flex: 1,
+  minWidth: 0,
+});
+
+const PlayerName = styled(Typography)({
+  color: theme.colors.text.primary,
+  fontWeight: 600,
+  fontSize: "1.1rem",
+  marginBottom: theme.spacing.xs,
+});
+
+const ActionsContainer = styled("div")({
+  display: "flex",
+  gap: theme.spacing.xs,
+  flexShrink: 0,
+});
+
+const ActionButton = styled(IconButton)(({ actiontype }) => {
+  const getActionStyles = () => {
+    switch (actiontype) {
+      case "view":
+        return {
+          background: `${theme.colors.status.info}20`,
+          color: theme.colors.status.info,
+          "&:hover": {
+            background: `${theme.colors.status.info}30`,
+            transform: "scale(1.1)",
+          },
+        };
+      case "edit":
+        return {
+          background: `${theme.colors.status.warning}20`,
+          color: theme.colors.status.warning,
+          "&:hover": {
+            background: `${theme.colors.status.warning}30`,
+            transform: "scale(1.1)",
+          },
+        };
+      case "delete":
+        return {
+          background: `${theme.colors.status.error}20`,
+          color: theme.colors.status.error,
+          "&:hover": {
+            background: `${theme.colors.status.error}30`,
+            transform: "scale(1.1)",
+          },
+        };
+      default:
+        return {};
+    }
+  };
+
+  return {
+    padding: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+    transition: "all 0.2s ease",
+    ...getActionStyles(),
+  };
+});
+
+const DetailsContainer = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing.sm,
+  flex: 1,
+});
+
+const DetailItem = styled("div")(({ fullwidth }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: theme.spacing.sm,
+  background: "rgba(255, 255, 255, 0.2)",
+  borderRadius: theme.borderRadius.sm,
+
+  ...(fullwidth && {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: theme.spacing.xs,
+  }),
+}));
+
+const DetailLabel = styled(Typography)({
+  color: theme.colors.text.secondary,
+  fontWeight: 600,
+  fontSize: "0.875rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px",
+});
+
+const DetailValue = styled(Typography)({
+  color: theme.colors.text.primary,
+  fontWeight: 600,
+  fontSize: "1rem",
+});
+
+const CardFooter = styled("div")({
+  marginTop: "auto",
+  paddingTop: theme.spacing.lg,
+  borderTop: `1px solid ${theme.colors.divider}`,
+  opacity: 0.8,
+});
+
+const CreatedDate = styled(Typography)({
+  color: theme.colors.text.disabled,
+  fontSize: "0.75rem",
+  textAlign: "center",
+  fontStyle: "italic",
+});
 
 const PlayerCard = ({
   player,
@@ -30,98 +197,90 @@ const PlayerCard = ({
   };
 
   return (
-    <Card className={`player-card ${className}`}>
-      <CardContent className="player-card__content">
-        <div className="player-card__header">
-          <div className="player-card__avatar">
-            <Avatar className="player-card__avatar-icon">
-              <PersonIcon />
-            </Avatar>
-          </div>
+    <StyledCard className={className}>
+      <StyledCardContent>
+        <CardHeader>
+          <StyledAvatar>
+            <PersonIcon />
+          </StyledAvatar>
 
-          <div className="player-card__basic-info">
-            <Typography variant="h6" className="player-card__name">
+          <BasicInfoContainer>
+            <PlayerName variant="h6">
               {player.firstName} {player.lastName}
-            </Typography>
-            <div className="player-card__nationality">
+            </PlayerName>
+            <NationalityContainer>
               <CountryFlags
                 nationalities={
                   player.countries?.map((c) => c.code.toLowerCase()) || []
                 }
                 size="small"
               />
-            </div>
-          </div>
+            </NationalityContainer>
+          </BasicInfoContainer>
 
           {showActions && (
-            <div className="player-card__actions">
-              <IconButton
+            <ActionsContainer>
+              <ActionButton
                 size="small"
                 onClick={() => onView(player)}
-                className="player-card__action player-card__action--view"
+                actiontype="view"
                 title="View Details"
               >
                 <VisibilityIcon />
-              </IconButton>
-              <IconButton
+              </ActionButton>
+              <ActionButton
                 size="small"
                 onClick={() => onEdit(player)}
-                className="player-card__action player-card__action--edit"
+                actiontype="edit"
                 title="Edit Player"
               >
                 <EditIcon />
-              </IconButton>
-              <IconButton
+              </ActionButton>
+              <ActionButton
                 size="small"
                 onClick={() => onDelete(player)}
-                className="player-card__action player-card__action--delete"
+                actiontype="delete"
                 title="Delete Player"
               >
                 <DeleteIcon />
-              </IconButton>
-            </div>
+              </ActionButton>
+            </ActionsContainer>
           )}
-        </div>
+        </CardHeader>
 
-        <div className="player-card__details">
-          <div className="player-card__detail-item">
-            <Typography variant="body2" className="player-card__detail-label">
-              Age
-            </Typography>
-            <Typography variant="body2" className="player-card__detail-value">
+        <DetailsContainer>
+          <DetailItem>
+            <DetailLabel variant="body2">Age</DetailLabel>
+            <DetailValue variant="body2">
               {calculateAge(player.dateOfBirth)} years
-            </Typography>
-          </div>
+            </DetailValue>
+          </DetailItem>
 
-          <div className="player-card__detail-item">
-            <Typography variant="body2" className="player-card__detail-label">
-              Height
-            </Typography>
-            <div className="player-card__detail-value">
+          <DetailItem>
+            <DetailLabel variant="body2">Height</DetailLabel>
+            <DetailValue>
               <HeightDisplay height={player.heightCm} showToggle={false} />
-            </div>
-          </div>
+            </DetailValue>
+          </DetailItem>
 
-          <div className="player-card__detail-item player-card__detail-item--full">
-            <Typography variant="body2" className="player-card__detail-label">
-              Positions
-            </Typography>
-            <div className="player-card__detail-value">
+          <DetailItem fullwidth>
+            <DetailLabel variant="body2">Positions</DetailLabel>
+            <div>
               <PositionBadges
                 positions={player.positions?.map((p) => p.code) || []}
                 size="small"
               />
             </div>
-          </div>
-        </div>
+          </DetailItem>
+        </DetailsContainer>
 
-        <div className="player-card__footer">
-          <Typography variant="caption" className="player-card__created-date">
+        <CardFooter>
+          <CreatedDate variant="caption">
             Created: {new Date(player.creationDate).toLocaleDateString()}
-          </Typography>
-        </div>
-      </CardContent>
-    </Card>
+          </CreatedDate>
+        </CardFooter>
+      </StyledCardContent>
+    </StyledCard>
   );
 };
 

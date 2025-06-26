@@ -1,5 +1,65 @@
 import React from "react";
-import { Chip, Box } from "@mui/material";
+import { Chip, Box, styled } from "@mui/material";
+import { theme } from "../../../styles/theme";
+
+// Styled Components
+const BadgeContainer = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.xs,
+  flexWrap: "wrap",
+});
+
+const PositionChip = styled(Chip)(({ category }) => {
+  const getPositionStyles = () => {
+    const categoryLower = category?.toLowerCase() || "";
+
+    if (categoryLower.includes("defender")) {
+      return {
+        background: `linear-gradient(135deg, ${theme.colors.primary.main}, ${theme.colors.primary.dark})`,
+        color: "white",
+        border: `1px solid ${theme.colors.primary.light}`,
+      };
+    }
+
+    if (categoryLower.includes("midfielder")) {
+      return {
+        background: `linear-gradient(135deg, ${theme.colors.accent.main}, #059669)`,
+        color: "white",
+        border: `1px solid ${theme.colors.accent.light}`,
+      };
+    }
+
+    if (categoryLower.includes("forward")) {
+      return {
+        background: `linear-gradient(135deg, ${theme.colors.status.error}, #dc2626)`,
+        color: "white",
+        border: `1px solid #f87171`,
+      };
+    }
+
+    return {
+      background: `linear-gradient(135deg, ${theme.colors.text.disabled}, #9ca3af)`,
+      color: "white",
+      border: `1px solid #d1d5db`,
+    };
+  };
+
+  return {
+    fontWeight: 600,
+    letterSpacing: "0.5px",
+    borderRadius: theme.borderRadius.sm,
+    fontSize: "0.75rem",
+    transition: "all 0.2s ease",
+    backdropFilter: "blur(5px)",
+    ...getPositionStyles(),
+
+    "&:hover": {
+      transform: "translateY(-1px)",
+      boxShadow: theme.shadows.md,
+    },
+  };
+});
 
 const PositionBadges = ({
   positions = [],
@@ -11,21 +71,9 @@ const PositionBadges = ({
     return null;
   }
 
-  const getPositionClass = (category) => {
-    if (!category) return "position-badge--default";
-
-    const categoryLower = category.toLowerCase();
-    if (categoryLower.includes("forward")) return "position-badge--forwards";
-    if (categoryLower.includes("midfielder"))
-      return "position-badge--midfielders";
-    if (categoryLower.includes("defender")) return "position-badge--defenders";
-    return "position-badge--default";
-  };
-
   return (
-    <Box className={`position-badges ${className}`}>
+    <BadgeContainer className={className}>
       {positions.map((position, index) => {
-        // Handle both string positions (from frontend) and position objects (from server)
         const positionCode =
           typeof position === "string" ? position : position.code;
         const positionName =
@@ -34,17 +82,17 @@ const PositionBadges = ({
           typeof position === "string" ? null : position.category;
 
         return (
-          <Chip
+          <PositionChip
             key={index}
             label={positionCode}
             size={size}
             variant={variant}
-            className={`position-badge ${getPositionClass(positionCategory)}`}
+            category={positionCategory}
             title={positionName || positionCode}
           />
         );
       })}
-    </Box>
+    </BadgeContainer>
   );
 };
 

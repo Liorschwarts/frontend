@@ -9,19 +9,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import muiTheme from "./theme/muiTheme";
 
-// Import CSS files
-import "./styles/globals.css";
-import "./styles/variables.css";
-import "./styles/mui-overrides.css";
-import "./components/ui/ui.css";
-import "./components/layout/layout.css";
-import "./components/players/display/display.css";
-import "./components/players/table/table.css";
-import "./components/players/forms/forms.css";
-import "./components/players/details/details.css";
-import "./pages/pages.css";
-import "./App.css";
-
 // Import pages
 import PlayersListPage from "./pages/PlayersListPage";
 import PlayerDetailsPage from "./pages/PlayerDetailsPage";
