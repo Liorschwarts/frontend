@@ -1,0 +1,171 @@
+/* Pages Styles */
+
+/* Common page styles */
+.players-list-page,
+.player-details-page,
+.add-player-page,
+.edit-player-page {
+  min-height: 100vh;
+}
+
+/* Players List Page */
+.players-list-page {
+  background-color: var(--background-default);
+}
+
+/* Player Details Page */
+.player-details-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md) 0;
+}
+
+.player-details-page__back-icon {
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.player-details-page__back-icon:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  transform: translateX(-2px);
+}
+
+.player-details-page__actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.player-details-page__edit-button {
+  border-color: var(--warning-color);
+  color: var(--warning-color);
+}
+
+.player-details-page__edit-button:hover {
+  background-color: rgba(237, 108, 2, 0.1);
+}
+
+.player-details-page__delete-button {
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+
+.player-details-page__delete-button:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.player-details-page__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xxl);
+}
+
+.player-details-page__error-alert {
+  max-width: 500px;
+}
+
+.player-details-page__back-button {
+  margin-top: var(--spacing-md);
+}
+
+.player-details-page__not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xxl);
+  text-align: center;
+}
+
+.player-details-page__not-found-title {
+  color: var(--text-secondary);
+}
+
+/* Add Player Page */
+.add-player-page__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+}
+
+.add-player-page__back-icon {
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.add-player-page__back-icon:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  transform: translateX(-2px);
+}
+
+.add-player-page__form {
+  margin-top: var(--spacing-lg);
+}
+
+/* Edit Player Page */
+.edit-player-page__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md) 0;
+}
+
+.edit-player-page__back-icon {
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.edit-player-page__back-icon:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  transform: translateX(-2px);
+}
+
+.edit-player-page__form {
+  margin-top: var(--spacing-lg);
+}
+
+.edit-player-page__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xxl);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .player-details-page__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+  
+  .player-details-page__actions {
+    justify-content: center;
+  }
+  
+  .add-player-page__header,
+  .edit-player-page__header {
+    padding: var(--spacing-sm) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-details-page__actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .player-details-page__edit-button,
+  .player-details-page__delete-button {
+    width: 100%;
+  }
+  
+  .player-details-page__not-found-title {
+    font-size: 1.25rem;
+  }
+}
