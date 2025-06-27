@@ -4,9 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import muiTheme from "./theme/muiTheme";
 import { AppProvider } from "./contexts/AppContext";
 
 import PlayersListPage from "./pages/PlayersListPage";
@@ -15,7 +13,7 @@ import PlayerFormPage from "./pages/PlayerFormPage";
 
 function App() {
   return (
-    <ThemeProvider theme={muiTheme}>
+    <>
       <CssBaseline />
       <AppProvider>
         <Router>
@@ -33,7 +31,7 @@ function App() {
           </div>
         </Router>
       </AppProvider>
-    </ThemeProvider>
+    </>
   );
 }
 

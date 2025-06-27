@@ -100,8 +100,4 @@ LoadingSpinner.Page = ({ text = "Loading page...", ...props }) => (
   </PageContainer>
 );
 
-LoadingSpinner.Button = ({ ...props }) => (
-  <CircularProgress size={20} color="inherit" {...props} />
-);
-
 export default LoadingSpinner;
