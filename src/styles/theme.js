@@ -1,23 +1,21 @@
-// src/styles/theme.js - נושא מרכזי מודרני וצבעוני
-
 export const theme = {
   colors: {
     primary: {
-      main: "#6366f1", // Indigo modern
+      main: "#6366f1",
       light: "#818cf8",
       dark: "#4f46e5",
       contrastText: "#ffffff",
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     },
     secondary: {
-      main: "#f59e0b", // Amber vibrant
+      main: "#f59e0b",
       light: "#fbbf24",
       dark: "#d97706",
       contrastText: "#ffffff",
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
     },
     accent: {
-      main: "#10b981", // Emerald
+      main: "#10b981",
       light: "#34d399",
       dark: "#059669",
       purple: "#8b5cf6",
@@ -113,7 +111,6 @@ export const theme = {
   },
 };
 
-// Helper functions
 export const getSpacing = (size) => theme.spacing[size] || size;
 export const getColor = (path) => {
   const keys = path.split(".");

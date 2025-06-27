@@ -1,8 +1,6 @@
-import React from "react";
 import { Box, styled } from "@mui/material";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const FlagsContainer = styled(Box)({
   display: "flex",
   alignItems: "center",
@@ -17,7 +15,7 @@ const FlagImage = styled("img")(({ size }) => {
         return { width: "20px", height: "15px" };
       case "large":
         return { width: "32px", height: "24px" };
-      default: // medium
+      default:
         return { width: "24px", height: "18px" };
     }
   };

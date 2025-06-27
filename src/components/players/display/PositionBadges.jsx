@@ -2,7 +2,6 @@ import React from "react";
 import { Chip, Box, styled } from "@mui/material";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const BadgeContainer = styled(Box)({
   display: "flex",
   alignItems: "center",

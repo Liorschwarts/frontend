@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
   TextField,
@@ -16,12 +16,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { playersApi } from "../../../services/playersApi";
 import Button from "../../ui/Button";
 import LoadingSpinner from "../../ui/LoadingSpinner";
+import { useAppContext } from "../../../contexts/AppContext";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const StyledPaper = styled(Paper)({
   background: theme.effects.glassmorphism.background,
   backdropFilter: theme.effects.glassmorphism.backdropFilter,
@@ -95,8 +94,16 @@ const PlayerForm = ({
   onSubmit = () => {},
   onCancel = () => {},
   loading = false,
+  title = null,
   className = "",
 }) => {
+  const {
+    countries,
+    positions,
+    loading: appLoading,
+    error: appError,
+  } = useAppContext();
+
   const [formData, setFormData] = useState({
     firstName: player?.firstName || "",
     lastName: player?.lastName || "",
@@ -107,36 +114,6 @@ const PlayerForm = ({
   });
 
   const [errors, setErrors] = useState({});
-  const [countries, setCountries] = useState([]);
-  const [positions, setPositions] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
-  const [apiError, setApiError] = useState(null);
-
-  // Load countries and positions from API
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoadingData(true);
-        setApiError(null);
-
-        // Load both countries and positions in parallel
-        const [countriesData, positionsData] = await Promise.all([
-          playersApi.getCountries(),
-          playersApi.getPositions(),
-        ]);
-
-        setCountries(countriesData);
-        setPositions(positionsData);
-      } catch (error) {
-        console.error("Failed to load form data:", error);
-        setApiError("Failed to load form data from server");
-      } finally {
-        setLoadingData(false);
-      }
-    };
-
-    loadData();
-  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -177,7 +154,6 @@ const PlayerForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Transform the data to match the expected format
       const submitData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -196,25 +172,24 @@ const PlayerForm = ({
   };
 
   const isEditing = Boolean(player);
+  const formTitle = title || (isEditing ? "Edit Player" : "Add New Player");
 
-  // Show loading spinner while loading data
-  if (loadingData) {
+  if (appLoading) {
     return (
       <StyledPaper className={className}>
         <FormHeader>
-          <FormTitle>{isEditing ? "Edit Player" : "Add New Player"}</FormTitle>
+          <FormTitle>{formTitle}</FormTitle>
         </FormHeader>
         <LoadingSpinner.Inline text="Loading form data..." />
       </StyledPaper>
     );
   }
 
-  // Show error if failed to load data
-  if (apiError) {
+  if (appError) {
     return (
       <StyledPaper className={className}>
         <FormHeader>
-          <FormTitle>{isEditing ? "Edit Player" : "Add New Player"}</FormTitle>
+          <FormTitle>{formTitle}</FormTitle>
         </FormHeader>
         <Typography
           color="error"
@@ -227,7 +202,7 @@ const PlayerForm = ({
             border: "1px solid rgba(244, 67, 54, 0.3)",
           }}
         >
-          ❌ {apiError}
+          ❌ {appError}
           <br />
           <Button
             variant="outlined"
@@ -244,7 +219,7 @@ const PlayerForm = ({
   return (
     <StyledPaper className={className}>
       <FormHeader>
-        <FormTitle>{isEditing ? "Edit Player" : "Add New Player"}</FormTitle>
+        <FormTitle>{formTitle}</FormTitle>
       </FormHeader>
 
       <FormGrid onSubmit={handleSubmit}>

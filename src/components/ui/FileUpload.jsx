@@ -1,11 +1,10 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Box, Typography, Alert, styled } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Button from "./Button";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const UploadContainer = styled(Box)({
   width: "100%",
   display: "flex",
@@ -73,13 +72,11 @@ const FileUpload = ({
   const [error, setError] = useState("");
 
   const handleFileSelect = (file) => {
-    // Validate CSV file
     if (!file.name.toLowerCase().endsWith(".csv")) {
       setError("Please select a CSV file");
       return;
     }
 
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
       setError("File size must be less than 5MB");
       return;

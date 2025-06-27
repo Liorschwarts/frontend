@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Typography, IconButton, styled } from "@mui/material";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const HeightContainer = styled("div")({
   display: "flex",
   alignItems: "center",

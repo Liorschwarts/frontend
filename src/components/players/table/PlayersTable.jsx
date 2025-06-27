@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from "react";
 import { Box, Typography, styled } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PlayerDataGrid from "./PlayerDataGrid";
 import FiltersPanel from "./FiltersPanel";
+import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const TableContainer = styled(Box)({
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  gap: theme.spacing.lg,
+  gap: theme.spacing.sm,
 });
 
 const TableHeader = styled("div")({
-  marginBottom: theme.spacing.lg,
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: theme.spacing.md,
 });
 
 const TableTitle = styled(Typography)({
@@ -26,6 +29,37 @@ const TableTitle = styled(Typography)({
   borderRadius: theme.borderRadius.md,
   backdropFilter: "blur(10px)",
   border: "1px solid rgba(255, 255, 255, 0.2)",
+});
+
+const HeaderActions = styled("div")({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.sm,
+});
+
+const BulkUploadButton = styled(Button)({
+  background: `linear-gradient(135deg, ${theme.colors.secondary.main}, ${theme.colors.secondary.dark})`,
+  color: "white",
+  padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+  borderRadius: theme.borderRadius.md,
+  fontWeight: 600,
+  fontSize: "0.9rem",
+  textTransform: "none",
+  boxShadow: theme.shadows.md,
+  border: "2px solid rgba(255, 255, 255, 0.2)",
+  backdropFilter: theme.effects.backdropBlur,
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+
+  "&:hover": {
+    background: `linear-gradient(135deg, ${theme.colors.secondary.light}, ${theme.colors.secondary.main})`,
+    transform: "translateY(-2px) scale(1.05)",
+    boxShadow: theme.shadows.lg,
+    border: "2px solid rgba(255, 255, 255, 0.4)",
+  },
+
+  "&:active": {
+    transform: "translateY(0) scale(1.02)",
+  },
 });
 
 const GridContainer = styled("div")({
@@ -41,113 +75,67 @@ const GridContainer = styled("div")({
 const PlayersTable = ({
   players = [],
   loading = false,
+  pagination = {},
   onView = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  onPageChange = () => {},
+  onBulkUpload = () => {},
+  onSearch = () => {},
+  onPageSizeChange = () => {},
+  onClearFilters = () => {},
   className = "",
 }) => {
-  const [filteredPlayers, setFilteredPlayers] = useState(players);
-
-  const handleFiltersChange = (filters) => {
-    // If no filters are active, show all players
-    const hasActiveFilters = !!(
-      filters.name ||
-      (filters.positionIds && filters.positionIds.length > 0) ||
-      (filters.countryIds && filters.countryIds.length > 0) ||
-      (filters.ageRange &&
-        (filters.ageRange.min !== 18 || filters.ageRange.max !== 40)) ||
-      (filters.heightRange &&
-        (filters.heightRange.min !== 160 || filters.heightRange.max !== 200))
-    );
-
-    if (!hasActiveFilters) {
-      setFilteredPlayers(players);
-      return;
-    }
-
-    let filtered = [...players];
-
-    if (filters.name) {
-      filtered = filtered.filter((player) =>
-        `${player.firstName} ${player.lastName}`
-          .toLowerCase()
-          .includes(filters.name.toLowerCase())
-      );
-    }
-
-    if (filters.positionIds?.length > 0) {
-      filtered = filtered.filter((player) =>
-        player.positions?.some((pos) => filters.positionIds.includes(pos.id))
-      );
-    }
-
-    if (filters.countryIds?.length > 0) {
-      filtered = filtered.filter((player) =>
-        player.countries?.some((country) =>
-          filters.countryIds.includes(country.id)
-        )
-      );
-    }
-
-    if (filters.ageRange?.min || filters.ageRange?.max) {
-      filtered = filtered.filter((player) => {
-        const age = calculateAge(player.dateOfBirth);
-        const min = filters.ageRange.min || 0;
-        const max = filters.ageRange.max || 100;
-        return age >= min && age <= max;
-      });
-    }
-
-    if (filters.heightRange?.min || filters.heightRange?.max) {
-      filtered = filtered.filter((player) => {
-        const min = filters.heightRange.min || 0;
-        const max = filters.heightRange.max || 300;
-        return player.heightCm >= min && player.heightCm <= max;
-      });
-    }
-
-    setFilteredPlayers(filtered);
+  const handlePageChange = (newPage) => {
+    onPageChange(newPage);
   };
 
-  const handlePlayersUpdate = (newPlayers) => {
-    console.log("Updating players list with:", newPlayers.length, "players");
-    console.log("Filtered Players:", newPlayers);
-    setFilteredPlayers(newPlayers);
+  const handlePageSizeChange = (newPageSize) => {
+    onPageSizeChange(newPageSize);
   };
 
-  useEffect(() => {
-    setFilteredPlayers(players);
-  }, [players]);
-
-  const calculateAge = (birthDate) => {
-    if (!birthDate) return 0;
-    const today = new Date();
-    const birth = new Date(birthDate);
-    return today.getFullYear() - birth.getFullYear();
+  const handleSearch = (searchCriteria) => {
+    onSearch(searchCriteria);
   };
 
-  useEffect(() => {
-    setFilteredPlayers(players);
-  }, [players]);
+  const handleClearFilters = () => {
+    onClearFilters();
+  };
 
   return (
     <TableContainer className={className}>
       <TableHeader>
-        <TableTitle>Players ({filteredPlayers.length})</TableTitle>
+        <TableTitle>
+          Players ({pagination.totalElements || players.length})
+        </TableTitle>
+
+        <HeaderActions>
+          <BulkUploadButton
+            variant="contained"
+            onClick={onBulkUpload}
+            startIcon={<CloudUploadIcon />}
+          >
+            Upload CSV
+          </BulkUploadButton>
+        </HeaderActions>
       </TableHeader>
 
       <FiltersPanel
-        onFiltersChange={handleFiltersChange}
-        onPlayersUpdate={handlePlayersUpdate}
+        onSearch={handleSearch}
+        onClear={handleClearFilters}
+        loading={loading}
       />
 
       <GridContainer>
         <PlayerDataGrid
-          players={filteredPlayers}
+          players={players}
           loading={loading}
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
         />
       </GridContainer>
     </TableContainer>

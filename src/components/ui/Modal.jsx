@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +11,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import Button from "./Button";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const StyledDialog = styled(Dialog)({
   "& .MuiBackdrop-root": {
     backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -48,7 +46,7 @@ const StyledDialogTitle = styled(DialogTitle)({
   display: "flex",
   alignItems: "center",
   position: "relative",
-  paddingTop: `calc(${theme.spacing.xl} + 4px)`, // Account for top border
+  paddingTop: `calc(${theme.spacing.xl} + 4px)`,
 });
 
 const TitleText = styled(Typography)({
@@ -61,7 +59,7 @@ const TitleText = styled(Typography)({
 const StyledCloseButton = styled(IconButton)({
   position: "absolute",
   right: theme.spacing.md,
-  top: `calc(${theme.spacing.md} + 4px)`, // Account for top border
+  top: `calc(${theme.spacing.md} + 4px)`,
   color: theme.colors.text.secondary,
   background: "rgba(255, 255, 255, 0.1)",
   backdropFilter: "blur(10px)",
@@ -127,7 +125,6 @@ const Modal = ({
   );
 };
 
-// Pre-built action buttons for common use cases
 Modal.Actions = {
   ConfirmCancel: ({
     onConfirm,

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Paper,
   Typography,
@@ -20,7 +19,6 @@ import PositionBadges from "../display/PositionBadges";
 import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const StyledPaper = styled(Paper)({
   background: theme.effects.glassmorphism.background,
   backdropFilter: theme.effects.glassmorphism.backdropFilter,

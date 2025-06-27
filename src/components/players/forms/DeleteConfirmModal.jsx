@@ -1,4 +1,3 @@
-import React from "react";
 import { Typography, Alert, Box, styled } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -7,7 +6,6 @@ import Modal from "../../ui/Modal";
 import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const ModalContent = styled(Box)({
   display: "flex",
   flexDirection: "column",

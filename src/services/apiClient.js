@@ -25,7 +25,6 @@ class ApiClient {
         throw new Error(await this.handleErrorResponse(response));
       }
 
-      // Handle no content responses
       if (response.status === HTTP_STATUS.NO_CONTENT) {
         return null;
       }
@@ -125,6 +124,5 @@ class ApiClient {
   }
 }
 
-// Create instance and export
 const apiClient = new ApiClient();
 export default apiClient;

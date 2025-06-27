@@ -1,36 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { IconButton, Alert, Snackbar, styled } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Alert, Snackbar, styled } from "@mui/material";
 import Layout from "../components/layout/Layout";
 import PlayerForm from "../components/players/forms/PlayerForm";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import usePlayersData from "../hooks/usePlayersData";
 import { theme } from "../styles/theme";
 
-// Styled Components
 const PageContainer = styled("div")({
   minHeight: "100vh",
-});
-
-const PageHeader = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  marginBottom: theme.spacing.sm, // Much smaller
-  padding: `${theme.spacing.xs} 0`, // Much smaller
-});
-
-const BackButton = styled(IconButton)({
-  background: `${theme.colors.primary.main}20`,
-  color: theme.colors.primary.main,
-  border: `1px solid ${theme.colors.primary.main}40`,
-  transition: "all 0.3s ease",
-
-  "&:hover": {
-    background: `${theme.colors.primary.main}30`,
-    transform: "translateX(-4px)",
-    boxShadow: theme.shadows.md,
-  },
 });
 
 const ErrorContainer = styled("div")({
@@ -38,16 +16,23 @@ const ErrorContainer = styled("div")({
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["2xl"], // Reduced from 3xl
+  marginTop: theme.spacing["2xl"],
 });
 
-const EditPlayerPage = () => {
+const StyledSnackbar = styled(Snackbar)({
+  "& .MuiAlert-root": {
+    borderRadius: theme.borderRadius.md,
+    backdropFilter: "blur(10px)",
+  },
+});
+
+const PlayerFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getPlayer, updatePlayer } = usePlayersData();
+  const { createPlayer, updatePlayer, getPlayer } = usePlayersData();
 
   const [player, setPlayer] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!id);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState({
@@ -56,12 +41,16 @@ const EditPlayerPage = () => {
     severity: "success",
   });
 
-  useEffect(() => {
-    const fetchPlayer = async () => {
-      setLoading(true);
-      setError(null);
+  const isEditMode = !!id;
+  const pageTitle = isEditMode ? "Edit Player" : "Add New Player";
 
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    const fetchPlayer = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const playerData = await getPlayer(id);
         setPlayer(playerData);
       } catch (err) {
@@ -71,34 +60,41 @@ const EditPlayerPage = () => {
       }
     };
 
-    if (id) {
-      fetchPlayer();
-    }
-  }, [id, getPlayer]);
-
-  const handleBack = () => {
-    navigate(`/players/${id}`);
-  };
+    fetchPlayer();
+  }, [id, isEditMode, getPlayer]);
 
   const handleSubmit = async (formData) => {
     setSaving(true);
 
     try {
-      const result = await updatePlayer(id, formData);
+      let result;
+      if (isEditMode) {
+        result = await updatePlayer(id, formData);
+      } else {
+        result = await createPlayer(formData);
+      }
 
       setNotification({
         open: true,
-        message: result.message || "Player updated successfully! ✅",
+        message:
+          result.message ||
+          `Player ${isEditMode ? "updated" : "created"} successfully! 🎉`,
         severity: "success",
       });
 
       setTimeout(() => {
-        navigate(`/players/${id}`);
+        if (isEditMode) {
+          navigate(`/players/${id}`);
+        } else {
+          navigate("/players");
+        }
       }, 1500);
     } catch (error) {
       setNotification({
         open: true,
-        message: error.message || "Failed to update player ❌",
+        message:
+          error.message ||
+          `Failed to ${isEditMode ? "update" : "create"} player ❌`,
         severity: "error",
       });
       setSaving(false);
@@ -106,14 +102,18 @@ const EditPlayerPage = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/players/${id}`);
+    if (isEditMode) {
+      navigate(`/players/${id}`);
+    } else {
+      navigate("/players");
+    }
   };
 
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
   };
 
-  if (loading) {
+  if (isEditMode && loading) {
     return (
       <Layout glassEffect={false}>
         <LoadingSpinner.Page text="Loading player data..." />
@@ -121,7 +121,7 @@ const EditPlayerPage = () => {
     );
   }
 
-  if (error || !player) {
+  if (isEditMode && (error || !player)) {
     return (
       <Layout glassEffect={false}>
         <ErrorContainer>
@@ -137,13 +137,14 @@ const EditPlayerPage = () => {
     <PageContainer>
       <Layout glassEffect={false}>
         <PlayerForm
-          player={player}
+          player={isEditMode ? player : null}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           loading={saving}
+          title={pageTitle}
         />
 
-        <Snackbar
+        <StyledSnackbar
           open={notification.open}
           autoHideDuration={6000}
           onClose={handleCloseNotification}
@@ -156,10 +157,10 @@ const EditPlayerPage = () => {
           >
             {notification.message}
           </Alert>
-        </Snackbar>
+        </StyledSnackbar>
       </Layout>
     </PageContainer>
   );
 };
 
-export default EditPlayerPage;
+export default PlayerFormPage;

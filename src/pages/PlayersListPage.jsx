@@ -1,33 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Alert, Snackbar, Fab, styled } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { Alert, Snackbar, styled } from "@mui/material";
 import Layout from "../components/layout/Layout";
 import PlayersTable from "../components/players/table/PlayersTable";
 import DeleteConfirmModal from "../components/players/forms/DeleteConfirmModal";
 import BulkUploadForm from "../components/players/forms/BulkUploadForm";
 import Modal from "../components/ui/Modal";
 import usePlayersData from "../hooks/usePlayersData";
-import { theme } from "../styles/theme";
 
-// Styled Components
 const PageContainer = styled("div")({
   minHeight: "100vh",
   position: "relative",
-});
-
-const BulkUploadFab = styled(Fab)({
-  position: "fixed",
-  bottom: theme.spacing.xl,
-  left: theme.spacing.xl, // Changed from right to left
-  background: `linear-gradient(135deg, ${theme.colors.secondary.main}, ${theme.colors.secondary.dark})`,
-  color: "white",
-  zIndex: 1000,
-
-  "&:hover": {
-    background: `linear-gradient(135deg, ${theme.colors.secondary.light}, ${theme.colors.secondary.main})`,
-    transform: "scale(1.1)",
-  },
 });
 
 const PlayersListPage = () => {
@@ -36,11 +19,15 @@ const PlayersListPage = () => {
     players,
     loading,
     error,
+    pagination,
+    searchPlayers,
     deletePlayer,
     bulkUploadPlayers,
+    changePage,
+    changePageSize,
+    clearFilters,
     clearError,
-    fetchPlayers,
-  } = usePlayersData();
+  } = usePlayersData({ page: 0, size: 10 });
 
   const [deleteModal, setDeleteModal] = useState({ open: false, player: null });
   const [bulkUploadModal, setBulkUploadModal] = useState(false);
@@ -96,9 +83,6 @@ const PlayersListPage = () => {
     try {
       const result = await bulkUploadPlayers(file, onProgress);
 
-      // Refresh the players list
-      await fetchPlayers();
-
       setBulkUploadModal(false);
       setNotification({
         open: true,
@@ -116,6 +100,38 @@ const PlayersListPage = () => {
     setBulkUploadModal(false);
   };
 
+  const handleSearch = async (searchCriteria) => {
+    try {
+      await searchPlayers(searchCriteria);
+    } catch (err) {
+      setNotification({
+        open: true,
+        message: "Search failed. Please try again.",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleClearFilters = async () => {
+    try {
+      clearFilters();
+    } catch (err) {
+      setNotification({
+        open: true,
+        message: "Failed to load players.",
+        severity: "error",
+      });
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    changePage(newPage);
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    changePageSize(newPageSize);
+  };
+
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
     clearError();
@@ -127,17 +143,17 @@ const PlayersListPage = () => {
         <PlayersTable
           players={players}
           loading={loading}
+          pagination={pagination}
           onView={handleViewPlayer}
           onEdit={handleEditPlayer}
           onDelete={handleDeleteClick}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          onSearch={handleSearch}
+          onClearFilters={handleClearFilters}
+          onBulkUpload={handleBulkUpload}
         />
 
-        {/* Bulk Upload FAB */}
-        <BulkUploadFab onClick={handleBulkUpload} title="Bulk Upload Players">
-          <CloudUploadIcon />
-        </BulkUploadFab>
-
-        {/* Delete Confirmation Modal */}
         <DeleteConfirmModal
           open={deleteModal.open}
           player={deleteModal.player}
@@ -146,7 +162,6 @@ const PlayersListPage = () => {
           loading={deleting}
         />
 
-        {/* Bulk Upload Modal */}
         <Modal
           open={bulkUploadModal}
           onClose={handleBulkUploadCancel}
@@ -160,7 +175,6 @@ const PlayersListPage = () => {
           />
         </Modal>
 
-        {/* Notifications */}
         <Snackbar
           open={notification.open || Boolean(error)}
           autoHideDuration={6000}

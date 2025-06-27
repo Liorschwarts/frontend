@@ -2,23 +2,143 @@ import apiClient from "./apiClient";
 import { API_ENDPOINTS, API_MESSAGES } from "../constants/apiEndpoints";
 
 export const playersApi = {
-  // Get all players
-  getAllPlayers: async (params = {}) => {
+  getPlayers: async (params = {}) => {
     try {
-      const queryString = new URLSearchParams(params).toString();
-      const url = queryString
-        ? `${API_ENDPOINTS.PLAYERS.GET_ALL}?${queryString}`
-        : API_ENDPOINTS.PLAYERS.GET_ALL;
+      const {
+        page = 0,
+        size = 10,
+        sortBy = null,
+        sortDirection = "asc",
+        ...filters
+      } = params;
 
+      const skip = page * size;
+      const top = size;
+
+      const queryParams = new URLSearchParams({
+        skip: skip.toString(),
+        top: top.toString(),
+        ...(sortBy && { sortBy, sortDirection }),
+        ...Object.fromEntries(
+          Object.entries(filters).filter(
+            ([_, v]) => v !== null && v !== undefined && v !== ""
+          )
+        ),
+      });
+
+      const url = `${API_ENDPOINTS.PLAYERS.GET_ALL}?${queryParams}`;
       const response = await apiClient.get(url);
-      return response || [];
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const totalElements = response.total || 0;
+        const currentPage = Math.floor(response.skip / response.top);
+        const totalPages = Math.ceil(totalElements / response.top);
+
+        return {
+          content: response.data,
+          totalElements,
+          totalPages,
+          number: currentPage,
+          size: response.top,
+          first: response.skip === 0,
+          last: !response.hasMore,
+          numberOfElements: response.data.length,
+        };
+      }
+
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: size,
+        first: true,
+        last: true,
+        numberOfElements: 0,
+      };
     } catch (error) {
       console.error("Error fetching players:", error);
       throw error;
     }
   },
 
-  // Get player by ID
+  getAllPlayers: async (params = {}) => {
+    try {
+      const response = await playersApi.getPlayers({ ...params, size: 1000 });
+      return response.content;
+    } catch (error) {
+      console.error("Error fetching all players:", error);
+      throw error;
+    }
+  },
+
+  searchPlayers: async (searchCriteria, paginationParams = null) => {
+    try {
+      let url;
+
+      if (paginationParams) {
+        const {
+          page = 0,
+          size = 10,
+          sortBy = null,
+          sortDirection = "asc",
+        } = paginationParams;
+        const queryParams = new URLSearchParams({
+          skip: (page * size).toString(),
+          top: size.toString(),
+          ...(sortBy && { sortBy, sortDirection }),
+        });
+        url = `${API_ENDPOINTS.PLAYERS.SEARCH}?${queryParams}`;
+      } else {
+        url = API_ENDPOINTS.PLAYERS.SEARCH;
+      }
+
+      const response = await apiClient.post(url, searchCriteria);
+
+      if (response && response.data && Array.isArray(response.data)) {
+        const totalElements = response.total || 0;
+
+        return {
+          content: response.data,
+          totalElements,
+          totalPages: 1,
+          number: 0,
+          size: response.data.length,
+          first: true,
+          last: true,
+          numberOfElements: response.data.length,
+        };
+      }
+
+      if (Array.isArray(response)) {
+        return {
+          content: response,
+          totalElements: response.length,
+          totalPages: 1,
+          number: 0,
+          size: response.length,
+          first: true,
+          last: true,
+          numberOfElements: response.length,
+        };
+      }
+
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: 0,
+        first: true,
+        last: true,
+        numberOfElements: 0,
+      };
+    } catch (error) {
+      console.error("Error searching players:", error);
+      throw error;
+    }
+  },
+
   getPlayerById: async (id) => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.PLAYERS.GET_BY_ID(id));
@@ -29,7 +149,6 @@ export const playersApi = {
     }
   },
 
-  // Create new player
   createPlayer: async (playerData) => {
     try {
       const response = await apiClient.post(
@@ -47,7 +166,6 @@ export const playersApi = {
     }
   },
 
-  // Update existing player
   updatePlayer: async (id, playerData) => {
     try {
       const response = await apiClient.put(
@@ -65,7 +183,6 @@ export const playersApi = {
     }
   },
 
-  // Delete player
   deletePlayer: async (id) => {
     try {
       await apiClient.delete(API_ENDPOINTS.PLAYERS.DELETE(id));
@@ -79,7 +196,6 @@ export const playersApi = {
     }
   },
 
-  // Bulk upload players from CSV
   bulkUploadPlayers: async (file, onProgress = () => {}) => {
     try {
       const response = await apiClient.uploadFile(
@@ -100,21 +216,6 @@ export const playersApi = {
     }
   },
 
-  // Search players using POST request
-  searchPlayers: async (searchCriteria) => {
-    try {
-      const response = await apiClient.post(
-        API_ENDPOINTS.PLAYERS.SEARCH,
-        searchCriteria
-      );
-      return response || [];
-    } catch (error) {
-      console.error("Error searching players:", error);
-      throw error;
-    }
-  },
-
-  // Get all countries
   getCountries: async () => {
     try {
       const response = await apiClient.get(
@@ -127,7 +228,6 @@ export const playersApi = {
     }
   },
 
-  // Get all positions
   getPositions: async () => {
     try {
       const response = await apiClient.get(

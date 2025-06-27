@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   TextField,
@@ -16,7 +16,7 @@ import {
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import { playersApi } from "../../../services/playersApi";
+import { useAppContext } from "../../../contexts/AppContext";
 import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
@@ -55,14 +55,14 @@ const SliderBox = styled("div")({
 });
 
 const FiltersPanel = ({
-  onFiltersChange = () => {},
-  onPlayersUpdate = () => {},
+  onSearch = () => {},
+  onClear = () => {},
+  loading = false,
   className = "",
 }) => {
+  const { countries, positions } = useAppContext();
+
   const [expanded, setExpanded] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [positions, setPositions] = useState([]);
-  const [countries, setCountries] = useState([]);
   const [filters, setFilters] = useState({
     name: "",
     positionIds: [],
@@ -71,64 +71,27 @@ const FiltersPanel = ({
     heightRange: { min: 160, max: 200 },
   });
 
-  // Load positions and countries from backend
-  useEffect(() => {
-    const loadFilterData = async () => {
-      try {
-        const [positionsData, countriesData] = await Promise.all([
-          playersApi.getPositions(),
-          playersApi.getCountries(),
-        ]);
-        setPositions(positionsData);
-        setCountries(countriesData);
-      } catch (error) {
-        console.error("Failed to load filter data:", error);
-      }
+  const handleSearch = () => {
+    const searchCriteria = {
+      name: filters.name || null,
+      positionIds: filters.positionIds.length > 0 ? filters.positionIds : null,
+      countryIds: filters.countryIds.length > 0 ? filters.countryIds : null,
+      minAge: filters.ageRange.min !== 18 ? filters.ageRange.min : null,
+      maxAge: filters.ageRange.max !== 40 ? filters.ageRange.max : null,
+      minHeight:
+        filters.heightRange.min !== 160 ? filters.heightRange.min : null,
+      maxHeight:
+        filters.heightRange.max !== 200 ? filters.heightRange.max : null,
     };
-    loadFilterData();
-  }, []);
 
-  const handleSearch = async () => {
-    setLoading(true);
-    try {
-      const searchCriteria = {
-        name: filters.name || null,
-        positionIds:
-          filters.positionIds.length > 0 ? filters.positionIds : null,
-        countryIds: filters.countryIds.length > 0 ? filters.countryIds : null,
-        minAge: filters.ageRange.min !== 18 ? filters.ageRange.min : null,
-        maxAge: filters.ageRange.max !== 40 ? filters.ageRange.max : null,
-        minHeight:
-          filters.heightRange.min !== 160 ? filters.heightRange.min : null,
-        maxHeight:
-          filters.heightRange.max !== 200 ? filters.heightRange.max : null,
-      };
+    const cleanCriteria = Object.fromEntries(
+      Object.entries(searchCriteria).filter(([_, v]) => v !== null && v !== "")
+    );
 
-      // Remove null values for cleaner request body
-      const cleanCriteria = Object.fromEntries(
-        Object.entries(searchCriteria).filter(
-          ([_, v]) => v !== null && v !== ""
-        )
-      );
-
-      console.log("Search criteria:", cleanCriteria);
-
-      const players = await playersApi.searchPlayers(cleanCriteria);
-      console.log("Search results:", players.length, "players found");
-      console.log("Search results data:", players);
-
-      onPlayersUpdate(players);
-      // DON'T call onFiltersChange here - it causes the filtering issue
-      // onFiltersChange(filters);
-    } catch (error) {
-      console.error("Search failed:", error);
-      // Even on error, don't call onFiltersChange
-    } finally {
-      setLoading(false);
-    }
+    onSearch(cleanCriteria);
   };
 
-  const clearFilters = async () => {
+  const clearFilters = () => {
     const cleared = {
       name: "",
       positionIds: [],
@@ -137,16 +100,7 @@ const FiltersPanel = ({
       heightRange: { min: 160, max: 200 },
     };
     setFilters(cleared);
-
-    // Reset to all players when clearing filters
-    try {
-      const allPlayers = await playersApi.getAllPlayers();
-      onPlayersUpdate(allPlayers);
-    } catch (error) {
-      console.error("Failed to load all players:", error);
-    }
-
-    // Don't call onFiltersChange here either - let it just show all players
+    onClear();
   };
 
   const updateFilter = (key, value) =>
@@ -169,6 +123,7 @@ const FiltersPanel = ({
           color="error"
           onClick={clearFilters}
           startIcon={<ClearIcon />}
+          disabled={loading}
         >
           Clear
         </Button>
@@ -180,8 +135,9 @@ const FiltersPanel = ({
           size="small"
           value={filters.name}
           onChange={(e) => updateFilter("name", e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+          onKeyPress={(e) => e.key === "Enter" && !loading && handleSearch()}
           sx={{ flex: 1 }}
+          disabled={loading}
         />
         <Button
           variant="contained"
@@ -201,6 +157,7 @@ const FiltersPanel = ({
               multiple
               value={filters.positionIds}
               onChange={(e) => updateFilter("positionIds", e.target.value)}
+              disabled={loading}
               renderValue={(selected) => (
                 <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                   {selected.map((id) => {
@@ -230,6 +187,7 @@ const FiltersPanel = ({
               multiple
               value={filters.countryIds}
               onChange={(e) => updateFilter("countryIds", e.target.value)}
+              disabled={loading}
               renderValue={(selected) => (
                 <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                   {selected.map((id) => {
@@ -262,6 +220,7 @@ const FiltersPanel = ({
               }
               min={16}
               max={45}
+              disabled={loading}
             />
           </SliderBox>
 
@@ -276,6 +235,7 @@ const FiltersPanel = ({
               }
               min={150}
               max={210}
+              disabled={loading}
             />
           </SliderBox>
         </FilterRow>

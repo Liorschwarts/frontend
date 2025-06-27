@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   CircularProgress,
@@ -8,7 +7,6 @@ import {
 } from "@mui/material";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const SpinnerContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
@@ -92,7 +90,6 @@ const LoadingSpinner = ({
   return <SpinnerContent />;
 };
 
-// Pre-built variants
 LoadingSpinner.Inline = ({ text = "Loading...", ...props }) => (
   <LoadingSpinner size={20} text={text} {...props} />
 );

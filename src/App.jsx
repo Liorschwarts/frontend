@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,34 +7,32 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
 import muiTheme from "./theme/muiTheme";
+import { AppProvider } from "./contexts/AppContext";
 
-// Import pages
 import PlayersListPage from "./pages/PlayersListPage";
 import PlayerDetailsPage from "./pages/PlayerDetailsPage";
-import AddPlayerPage from "./pages/AddPlayerPage";
-import EditPlayerPage from "./pages/EditPlayerPage";
+import PlayerFormPage from "./pages/PlayerFormPage";
 
 function App() {
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Router>
-        <div className="app">
-          <Routes>
-            {/* Redirect root to players list */}
-            <Route path="/" element={<Navigate to="/players" replace />} />
+      <AppProvider>
+        <Router>
+          <div className="app">
+            <Routes>
+              <Route path="/" element={<Navigate to="/players" replace />} />
 
-            {/* Players routes */}
-            <Route path="/players" element={<PlayersListPage />} />
-            <Route path="/players/add" element={<AddPlayerPage />} />
-            <Route path="/players/:id" element={<PlayerDetailsPage />} />
-            <Route path="/players/:id/edit" element={<EditPlayerPage />} />
+              <Route path="/players" element={<PlayersListPage />} />
+              <Route path="/players/add" element={<PlayerFormPage />} />
+              <Route path="/players/:id" element={<PlayerDetailsPage />} />
+              <Route path="/players/:id/edit" element={<PlayerFormPage />} />
 
-            {/* Catch all - redirect to players */}
-            <Route path="*" element={<Navigate to="/players" replace />} />
-          </Routes>
-        </div>
-      </Router>
+              <Route path="*" element={<Navigate to="/players" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </AppProvider>
     </ThemeProvider>
   );
 }

@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { IconButton, Typography, Alert, styled } from "@mui/material";
+import { Typography, Alert, styled } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Layout from "../components/layout/Layout";
 import PlayerDetails from "../components/players/details/PlayerDetails";
 import DeleteConfirmModal from "../components/players/forms/DeleteConfirmModal";
@@ -12,31 +10,8 @@ import Button from "../components/ui/Button";
 import usePlayersData from "../hooks/usePlayersData";
 import { theme } from "../styles/theme";
 
-// Styled Components
 const PageContainer = styled("div")({
   minHeight: "100vh",
-});
-
-const PageHeader = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  marginBottom: theme.spacing.sm, // Much smaller
-  padding: `${theme.spacing.xs} 0`, // Much smaller
-});
-
-const BackButton = styled(IconButton)({
-  background: `${theme.colors.primary.main}20`,
-  color: theme.colors.primary.main,
-  border: `1px solid ${theme.colors.primary.main}40`,
-  transition: "all 0.3s ease",
-  margin: 0, // Remove default margin
-  padding: theme.spacing.sm, // Control padding explicitly
-
-  "&:hover": {
-    background: `${theme.colors.primary.main}30`,
-    transform: "translateX(-4px)",
-    boxShadow: theme.shadows.md,
-  },
 });
 
 const ErrorContainer = styled("div")({
@@ -44,7 +19,7 @@ const ErrorContainer = styled("div")({
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["2xl"], // Reduced from 3xl
+  marginTop: theme.spacing["2xl"],
 });
 
 const NotFoundContainer = styled("div")({
@@ -52,7 +27,7 @@ const NotFoundContainer = styled("div")({
   flexDirection: "column",
   alignItems: "center",
   gap: theme.spacing.lg,
-  marginTop: theme.spacing["2xl"], // Reduced from 3xl
+  marginTop: theme.spacing["2xl"],
   textAlign: "center",
 });
 

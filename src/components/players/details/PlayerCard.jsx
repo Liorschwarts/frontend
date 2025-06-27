@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -16,7 +15,6 @@ import HeightDisplay from "../display/HeightDisplay";
 import PositionBadges from "../display/PositionBadges";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const StyledCard = styled(Card)({
   background: theme.effects.glassmorphism.background,
   backdropFilter: theme.effects.glassmorphism.backdropFilter,

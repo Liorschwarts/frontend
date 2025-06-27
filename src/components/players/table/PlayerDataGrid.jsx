@@ -1,4 +1,3 @@
-import React from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { IconButton, styled } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -9,7 +8,6 @@ import HeightDisplay from "../display/HeightDisplay";
 import PositionBadges from "../display/PositionBadges";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const StyledDataGrid = styled(DataGrid)({
   border: "none",
   borderRadius: theme.borderRadius.md,
@@ -22,7 +20,6 @@ const StyledDataGrid = styled(DataGrid)({
     borderRadius: theme.borderRadius.md,
   },
 
-  // Header styles
   "& .MuiDataGrid-columnHeaders": {
     borderBottom: "1px solid rgba(8, 6, 6, 0.1)",
     minHeight: "56px",
@@ -78,12 +75,9 @@ const StyledDataGrid = styled(DataGrid)({
     },
   },
 
-  // Row styles
   "& .MuiDataGrid-row": {
     borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
     minHeight: "64px",
-
-    "&:nth-of-type(even)": {},
 
     "&:hover": {
       backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -98,7 +92,6 @@ const StyledDataGrid = styled(DataGrid)({
     },
   },
 
-  // Cell styles
   "& .MuiDataGrid-cell": {
     padding: theme.spacing.md,
     borderBottom: "none",
@@ -122,7 +115,6 @@ const StyledDataGrid = styled(DataGrid)({
     },
   },
 
-  // Footer styles
   "& .MuiDataGrid-footerContainer": {
     borderTop: "1px solid rgba(0, 0, 0, 0.1)",
     minHeight: "52px",
@@ -146,7 +138,6 @@ const StyledDataGrid = styled(DataGrid)({
     },
   },
 
-  // Scrollbar
   "& .MuiDataGrid-virtualScroller": {
     "&::-webkit-scrollbar": {
       width: "8px",
@@ -262,9 +253,12 @@ const EmptyStateContainer = styled("div")({
 const PlayerDataGrid = ({
   players = [],
   loading = false,
+  pagination = {},
   onView = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  onPageChange = () => {},
+  onPageSizeChange = () => {},
   className = "",
 }) => {
   const calculateAge = (birthDate) => {
@@ -379,11 +373,23 @@ const PlayerDataGrid = ({
     },
   ];
 
+  const handlePaginationModelChange = (paginationModel) => {
+    const { page, pageSize } = paginationModel;
+
+    if (page !== pagination.currentPage) {
+      onPageChange(page);
+    }
+
+    if (pageSize !== pagination.pageSize) {
+      onPageSizeChange(pageSize);
+    }
+  };
+
   if (!players || players.length === 0) {
     return (
       <EmptyStateContainer className={className}>
         <span style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚽</span>
-        <p>No players found</p>
+        <p>{loading ? "Loading players..." : "No players found"}</p>
       </EmptyStateContainer>
     );
   }
@@ -394,9 +400,15 @@ const PlayerDataGrid = ({
         rows={players}
         columns={columns}
         loading={loading}
+        paginationMode="server"
+        paginationModel={{
+          page: pagination.currentPage || 0,
+          pageSize: pagination.pageSize || 10,
+        }}
+        onPaginationModelChange={handlePaginationModelChange}
+        rowCount={pagination.totalElements || 0}
+        pageSizeOptions={[5, 10, 20, 50]}
         disableSelectionOnClick
-        pageSize={10}
-        rowsPerPageOptions={[10, 20, 50]}
         getRowId={(row) => row.id}
         disableColumnMenu
         disableColumnSelector
@@ -416,6 +428,17 @@ const PlayerDataGrid = ({
           "& .MuiDataGrid-columnHeader": {
             background: "transparent !important",
             color: `${theme.colors.text.primary}`,
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "1px solid rgba(0, 0, 0, 0.1)",
+            "& .MuiTablePagination-root": {
+              color: theme.colors.text.primary,
+            },
+            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+              {
+                color: theme.colors.text.primary,
+                fontWeight: 500,
+              },
           },
         }}
       />

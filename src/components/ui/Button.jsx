@@ -1,8 +1,6 @@
-import React from "react";
 import { Button as MuiButton, styled } from "@mui/material";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const StyledButton = styled(MuiButton)(({ variant, color, size }) => {
   const getVariantStyles = () => {
     switch (variant) {
@@ -113,7 +111,7 @@ const StyledButton = styled(MuiButton)(({ variant, color, size }) => {
           fontSize: "1.1rem",
           minHeight: "48px",
         };
-      default: // medium
+      default:
         return {
           padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
           fontSize: "0.9rem",

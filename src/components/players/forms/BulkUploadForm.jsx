@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Paper,
   Typography,
@@ -14,7 +14,6 @@ import FileUpload from "../../ui/FileUpload";
 import Button from "../../ui/Button";
 import { theme } from "../../../styles/theme";
 
-// Styled Components
 const UploadContainer = styled(Paper)({
   background: theme.effects.glassmorphism.background,
   backdropFilter: theme.effects.glassmorphism.backdropFilter,
@@ -41,16 +40,6 @@ const UploadTitle = styled(Typography)({
 const UploadSubtitle = styled(Typography)({
   color: theme.colors.text.secondary,
   fontSize: "1rem",
-});
-
-const InfoAlert = styled(Alert)({
-  marginBottom: theme.spacing.xl,
-  borderRadius: theme.borderRadius.md,
-  textAlign: "left",
-
-  "& .MuiAlert-message": {
-    fontSize: "0.9rem",
-  },
 });
 
 const ProgressContainer = styled(Box)({

@@ -1,12 +1,9 @@
-// API Endpoints Constants
-
 const BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:8082/api";
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8081/api";
 
 export const API_ENDPOINTS = {
   BASE_URL,
 
-  // Players endpoints
   PLAYERS: {
     BASE: `${BASE_URL}/players`,
     GET_ALL: `${BASE_URL}/players`,
@@ -15,11 +12,10 @@ export const API_ENDPOINTS = {
     UPDATE: (id) => `${BASE_URL}/players/${id}`,
     DELETE: (id) => `${BASE_URL}/players/${id}`,
     BULK_UPLOAD: `${BASE_URL}/players/bulk`,
-    SEARCH: `${BASE_URL}/players/search`, // POST request
+    SEARCH: `${BASE_URL}/players/search`,
   },
 };
 
-// HTTP Status Codes
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -32,7 +28,6 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-// API Response Messages
 export const API_MESSAGES = {
   SUCCESS: {
     PLAYER_CREATED: "Player created successfully",

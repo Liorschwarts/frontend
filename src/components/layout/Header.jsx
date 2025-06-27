@@ -1,4 +1,3 @@
-import React from "react";
 import { AppBar, Toolbar, Typography, styled } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SportsFootballIcon from "@mui/icons-material/SportsFootball";
@@ -6,7 +5,6 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "../ui/Button";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const StyledAppBar = styled(AppBar)({
   background: theme.colors.primary.gradient,
   boxShadow: theme.shadows.lg,

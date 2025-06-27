@@ -1,9 +1,7 @@
-import React from "react";
 import { Box, Container, styled } from "@mui/material";
 import Header from "./Header";
 import { theme } from "../../styles/theme";
 
-// Styled Components
 const LayoutWrapper = styled(Box)({
   minHeight: "100vh",
   background: theme.colors.background.default,
