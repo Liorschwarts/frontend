@@ -395,9 +395,8 @@ const PlayerDataGrid = ({
         columns={columns}
         loading={loading}
         disableSelectionOnClick
-        autoHeight
-        pageSize={25}
-        rowsPerPageOptions={[10, 25, 50, 100]}
+        pageSize={10}
+        rowsPerPageOptions={[10, 20, 50]}
         getRowId={(row) => row.id}
         disableColumnMenu
         disableColumnSelector
